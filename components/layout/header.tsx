@@ -15,7 +15,6 @@ export function Header() {
     { label: "Metodologia", href: "#metodologia" },
     { label: "Casos de Sucesso", href: "#cases" },
     { label: "Contato", href: "#contato" },
-    { label: "5 Logos (400x150)", href: "/logos" },
   ];
 
   return (
@@ -101,4 +100,3 @@ export function Header() {
     </header>
   );
 }
-
