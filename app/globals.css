@@ -4,8 +4,8 @@
 
 @layer base {
   :root {
-    --background: #f8fafc;
-    --foreground: #0f172a;
+    --background: #070f1e;
+    --foreground: #f8fafc;
   }
 
   html {
@@ -18,11 +18,11 @@
     background-color: var(--background);
     color: var(--foreground);
     font-feature-settings: "rlig" 1, "calt" 1;
+    overflow-x: hidden;
   }
 
   ::selection {
-    background-color: #e0f2fe;
-    color: #0369a1;
+    background-color: #f59e0b;
+    color: #040914;
   }
 }
-

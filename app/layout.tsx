@@ -7,7 +7,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "SINERGIA | Economia de Energia, Mercado Livre & Ecossistema de Gestão",
+  title: "SÍNERGIA | Economia de Energia, Mercado Livre & Ecossistema de Gestão",
   description:
     "Economize de 10% a 30% na sua fatura de energia sem obras ou investimentos. Estrutura digital completa para clientes B2B, B2C, Corretores e Líderes.",
   keywords: [
@@ -23,14 +23,14 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Sinergia" }],
   icons: {
-    icon: "/logo-oficial.png",
+    icon: "/sinergia-logo-vector.svg",
   },
   robots: "index, follow",
   openGraph: {
     type: "website",
     locale: "pt_BR",
     url: "https://sinergia.tech",
-    title: "SINERGIA | Economia de Energia & Oportunidade de Negócio",
+    title: "SÍNERGIA | Economia de Energia & Oportunidade de Negócio",
     description:
       "Economize de 10% a 30% na fatura de energia. Sem obras, sem custo de adesão e 100% digital.",
     siteName: "Sinergia",
@@ -43,8 +43,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className="scroll-smooth">
-      <body className="min-h-screen bg-surface-subtle text-slate-900 font-sans antialiased selection:bg-solar-100 selection:text-solar-900">
+    <html lang="pt-BR" className="scroll-smooth dark">
+      <body className="min-h-screen bg-navy-900 text-slate-100 font-sans antialiased selection:bg-solar-500 selection:text-navy-950">
         {children}
       </body>
     </html>

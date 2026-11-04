@@ -3,20 +3,22 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Hero } from "@/components/sections/hero";
 import { HowItWorks } from "@/components/sections/how-it-works";
-import { Ecosystem } from "@/components/sections/ecosystem";
+import { Simulator } from "@/components/sections/simulator";
 import { Coverage } from "@/components/sections/coverage";
-import { ProspectingLead } from "@/components/sections/prospecting-lead";
+import { Ecosystem } from "@/components/sections/ecosystem";
+import { Contact } from "@/components/sections/contact";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col bg-surface-subtle selection:bg-solar-100 selection:text-solar-900">
+    <div className="flex min-h-screen flex-col bg-navy-950 text-slate-100 selection:bg-solar-500 selection:text-navy-950">
       <Header />
       <main className="flex-1">
         <Hero />
         <HowItWorks />
-        <Ecosystem />
+        <Simulator />
         <Coverage />
-        <ProspectingLead />
+        <Ecosystem />
+        <Contact />
       </main>
       <Footer />
     </div>

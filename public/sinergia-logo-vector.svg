@@ -1,0 +1,15 @@
+<svg width="210" height="50" viewBox="0 0 210 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <text x="6" y="36" font-family="system-ui, -apple-system, 'Inter', 'Segoe UI', Roboto, sans-serif" font-size="34" font-weight="900" letter-spacing="-0.03em" fill="#0A192F">
+    SÍNERG
+  </text>
+  <text x="133" y="36" font-family="system-ui, -apple-system, 'Inter', 'Segoe UI', Roboto, sans-serif" font-size="34" font-weight="900" letter-spacing="-0.03em" fill="#F97316">
+    IA
+  </text>
+  <g transform="translate(172, 10)">
+    <rect x="2" y="18" width="4.5" height="12" rx="1.5" fill="#0F2042"/>
+    <rect x="8.5" y="12" width="4.5" height="18" rx="1.5" fill="#1D4ED8"/>
+    <rect x="15" y="6" width="4.5" height="24" rx="1.5" fill="#F59E0B"/>
+    <path d="M0 24 Q 10 16, 25 3" stroke="#F97316" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <path d="M19 2 L 26 2 L 26 9 Z" fill="#F97316"/>
+  </g>
+</svg>
