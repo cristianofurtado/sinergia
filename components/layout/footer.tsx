@@ -42,7 +42,7 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <a href="#energia" className="hover:text-blue-900 transition-colors">
+                <a href="#venda-energia" className="hover:text-blue-900 transition-colors">
                   Venda Energia
                 </a>
               </li>
