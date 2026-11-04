@@ -11,7 +11,7 @@ export function Header() {
 
   const navLinks = [
     { label: "Início", href: "#inicio" },
-    { label: "Energia", href: "#energia" },
+    { label: "Venda Energia", href: "#energia" },
     { label: "Como Funciona", href: "#como-funciona" },
     { label: "Simulador", href: "#simulador" },
     { label: "Contato", href: "#contato" },

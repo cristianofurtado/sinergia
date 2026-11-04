@@ -37,7 +37,7 @@ export function Footer() {
               </li>
               <li>
                 <a href="#energia" className="hover:text-solar-400 transition-colors">
-                  Energia & Oportunidade
+                  Venda Energia
                 </a>
               </li>
               <li>

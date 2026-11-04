@@ -1,89 +1,110 @@
 "use client";
 
 import React, { useState } from "react";
-import { Zap, Radio, Globe, Users, Megaphone, DollarSign, Headphones, ArrowRight, CheckCircle2 } from "lucide-react";
+import {
+  Zap,
+  Building2,
+  Calculator,
+  Users,
+  DollarSign,
+  FileCheck2,
+  ShieldCheck,
+  GraduationCap,
+  ArrowRight,
+  CheckCircle2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function Ecosystem() {
-  const [activeCategory, setActiveCategory] = useState<string>("Vendas");
-  const [selectedModule, setSelectedModule] = useState<string>("Venda Energia");
+  const [activeCategory, setActiveCategory] = useState<string>("Venda B2C");
+  const [selectedModule, setSelectedModule] = useState<string>("Venda Energia B2C");
 
   const modules = [
     {
-      id: "Venda Energia",
-      title: "Venda Energia",
-      category: "Vendas",
+      id: "Venda Energia B2C",
+      title: "Venda Energia B2C",
+      category: "Venda B2C",
       icon: Zap,
       highlight: true,
-      desc: "Comissões recorrentes com assinatura de energia limpa para residências (B2C) e grandes empresas (B2B/Mercado Livre).",
+      desc: "Assinatura de energia limpa para residências e comércios. Cliente ganha até 26% de desconto na conta e você recebe comissões mensais recorrentes.",
     },
     {
-      id: "Venda Rastreamento",
-      title: "Venda Rastreamento",
-      category: "Vendas",
-      icon: Radio,
-      desc: "Soluções de telemetria e rastreamento veicular e frotas corporativas integradas ao ecossistema.",
+      id: "Mercado Livre B2B",
+      title: "Mercado Livre B2B",
+      category: "Mercado Livre B2B",
+      icon: Building2,
+      desc: "Atenda indústrias, redes e empresas de médio/grande porte (Grupo A). Migração sem custos e descontos de até 30% no consumo com grandes comissões.",
     },
     {
-      id: "Venda SaaS",
-      title: "Venda SaaS",
-      category: "Vendas",
-      icon: Globe,
-      desc: "Softwares de gestão e automação por assinatura para PMEs e redes parceiras.",
+      id: "Simulador de Faturas",
+      title: "Simulador de Faturas",
+      category: "Simulador",
+      icon: Calculator,
+      desc: "Calculadora comercial instantânea: insira o valor da fatura do cliente e gere em segundos a proposta com o valor exato da economia anual.",
     },
     {
-      id: "CRM",
-      title: "CRM",
-      category: "Gestão",
+      id: "CRM de Prospecção",
+      title: "CRM de Energia",
+      category: "Venda B2C",
       icon: Users,
-      desc: "Funil completo de prospecção, distribuição automática de leads e esteira de fechamento.",
+      desc: "Organize seus contatos, envie links de adesão, acompanhe status de análise da conta de luz e receba notificações de contratos assinados.",
     },
     {
-      id: "Marketing",
-      title: "Marketing",
-      category: "Marketing",
-      icon: Megaphone,
-      desc: "Materiais validados, páginas de captura prontas e campanhas direcionadas para captação de clientes.",
-    },
-    {
-      id: "Financeiro",
-      title: "Financeiro",
-      category: "Financeiro",
+      id: "Comissões Recorrentes",
+      title: "Comissões Recorrentes",
+      category: "Comissões",
       icon: DollarSign,
-      desc: "Extrato transparente de comissões, split de pagamentos e previsibilidade de receita recorrente.",
+      highlight: true,
+      desc: "Previsibilidade financeira real: receba todo mês uma porcentagem recorrente sobre a economia da conta de luz de toda a sua carteira ativa.",
     },
     {
-      id: "Suporte",
-      title: "Suporte",
+      id: "Assinatura Digital",
+      title: "Assinatura Digital",
+      category: "Venda B2C",
+      icon: FileCheck2,
+      desc: "Fechamento 100% online pelo WhatsApp ou celular. O cliente assina em poucos cliques com validade jurídica e zero papelada.",
+    },
+    {
+      id: "Suporte Regulatório",
+      title: "Suporte Regulatório",
       category: "Suporte",
-      icon: Headphones,
-      desc: "Central de atendimento para pós-venda, dúvidas operacionais e relacionamento com a distribuidora.",
+      icon: ShieldCheck,
+      desc: "Nossa equipe cuida de toda a interlocução com concessionárias (CEMIG, CPFL, Enel, Equatorial, Copel, etc.) e injeção de créditos.",
+    },
+    {
+      id: "Treinamento em Energia",
+      title: "Treinamento & Pitch",
+      category: "Suporte",
+      icon: GraduationCap,
+      desc: "Capacitação completa sobre o setor elétrico, Lei Federal 14.300/22, quebra de objeções e materiais prontos para captação.",
     },
   ];
 
-  const categories = ["Vendas", "Gestão", "Marketing", "Financeiro", "Suporte"];
+  const categories = ["Venda B2C", "Mercado Livre B2B", "Comissões", "Simulador", "Suporte"];
   const currentModuleData = modules.find((m) => m.id === selectedModule) || modules[0];
 
   return (
     <section id="estrutura" className="py-20 bg-navy-950 border-b border-navy-800/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-          {/* Left Column: Headline and Bullets from Image 1 */}
+          {/* Left Column: Headline and Bullets */}
           <div className="lg:col-span-6 space-y-6">
             <div className="space-y-3">
-              <span className="text-xs font-bold tracking-widest uppercase text-sky-400">
-                ECOSSISTEMA INTEGRADO
+              <span className="text-xs font-bold tracking-widest uppercase text-solar-400 bg-solar-500/10 px-3 py-1 rounded-full border border-solar-500/30">
+                VENDA DE ENERGIA • GESTÃO & COMISSÕES
               </span>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
-                Seu negócio. Sua gestão. <br />
-                <span className="text-solar-400">Tudo em um só lugar.</span>
+                Venda de Energia. <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-solar-400 to-solar-orange">
+                  Sua gestão. Tudo em um só lugar.
+                </span>
               </h2>
-              <p className="text-base sm:text-lg text-slate-300 leading-relaxed pt-2">
-                Uma estrutura digital criada para que Corretores e Líderes possam vender, acompanhar, administrar e expandir seus negócios.
+              <p className="text-base sm:text-lg text-slate-300 leading-relaxed pt-2 font-normal">
+                Uma estrutura digital completa criada para que Corretores, Consultores e Líderes possam vender energia solar por assinatura e Mercado Livre, acompanhar contratos e faturar comissões mensais recorrentes.
               </p>
             </div>
 
-            {/* Bullet Points with highlight on Venda Energia */}
+            {/* Bullet Points */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
               {modules.map((mod) => {
                 const isSelected = selectedModule === mod.id;
@@ -99,7 +120,7 @@ export function Ecosystem() {
                         ? "text-solar-300 bg-solar-500/15 border border-solar-500/50 shadow-sm"
                         : isSelected
                         ? "text-white bg-navy-800 border border-navy-600 shadow-sm"
-                        : "text-slate-300 hover:text-white hover:bg-navy-850"
+                        : "text-slate-300 hover:text-white hover:bg-navy-850 border border-navy-800"
                     }`}
                   >
                     <span
@@ -110,7 +131,7 @@ export function Ecosystem() {
                     <span>{mod.title}</span>
                     {mod.highlight && (
                       <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-solar-500 text-navy-950 ml-auto">
-                        Foco
+                        Destaque
                       </span>
                     )}
                   </button>
@@ -118,21 +139,26 @@ export function Ecosystem() {
               })}
             </div>
 
-            {/* CTA Button from Image 1 */}
-            <div className="pt-4">
+            {/* CTA Button */}
+            <div className="pt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <a href="#contato">
-                <Button variant="solar" size="lg" className="w-full sm:w-auto font-bold text-navy-950 shadow-glow">
-                  Conheça a estrutura
+                <Button variant="solar" size="lg" className="w-full sm:w-auto font-black text-navy-950 shadow-glow">
+                  Quero Vender Energia Sinergia
                   <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </a>
+              <a href="#simulador">
+                <Button variant="outline" size="lg" className="w-full sm:w-auto border-navy-700 bg-navy-900/80 text-slate-200">
+                  Ver Simulador de Fatura
                 </Button>
               </a>
             </div>
           </div>
 
-          {/* Right Column: Interactive Grid from Image 1 */}
+          {/* Right Column: Interactive Grid */}
           <div className="lg:col-span-6">
             <div className="bg-navy-900 rounded-3xl border border-navy-700 p-6 sm:p-8 shadow-elevation space-y-6">
-              {/* Modules Matrix Grid (2 Columns like in Image 1) */}
+              {/* Modules Matrix Grid (2 Columns) */}
               <div className="grid grid-cols-2 gap-px bg-navy-800 rounded-2xl overflow-hidden border border-navy-700">
                 {modules.map((mod) => {
                   const Icon = mod.icon;
@@ -173,17 +199,13 @@ export function Ecosystem() {
                     </button>
                   );
                 })}
-
-                <div className="p-4 sm:p-5 flex items-center justify-center bg-navy-900/60 text-xs font-medium text-slate-400 italic">
-                  + Módulos em expansão
-                </div>
               </div>
 
               {/* Dynamic details card for selected module */}
               <div className="bg-navy-950 rounded-2xl p-4 sm:p-5 border border-navy-800 space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    Módulo selecionado
+                    Solução de Venda de Energia
                   </span>
                   <span className="text-xs px-2.5 py-0.5 rounded-full bg-navy-800 text-solar-300 font-semibold border border-navy-700">
                     {currentModuleData.category}
@@ -198,7 +220,7 @@ export function Ecosystem() {
                 </p>
               </div>
 
-              {/* Category Pills from bottom of Image 1 */}
+              {/* Category Pills */}
               <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-navy-800">
                 {categories.map((cat) => (
                   <button

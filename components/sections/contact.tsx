@@ -72,13 +72,13 @@ export function Contact() {
         <div className="text-center space-y-3 max-w-2xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-navy-850 border border-solar-500/30 text-solar-400 text-xs font-bold uppercase tracking-wider">
             <Users className="w-3.5 h-3.5" />
-            Atendimento Direto & Especialistas
+            Especialistas em Venda de Energia
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
-            Fale com nossa equipe técnica
+            Fale com nossa equipe de Venda de Energia
           </h2>
           <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-            Atendimento humano, ágil e sem enrolação. Escolha o especialista da sua região ou envie seus dados abaixo.
+            Atendimento direto para economizar na sua fatura ou se cadastrar como corretor parceiro de energia.
           </p>
         </div>
 
@@ -171,7 +171,7 @@ export function Contact() {
                     : "text-slate-400 hover:text-white"
                 }`}
               >
-                Quero Economizar
+                Quero Economizar na Fatura
               </button>
               <button
                 type="button"
@@ -182,7 +182,7 @@ export function Contact() {
                     : "text-slate-400 hover:text-white"
                 }`}
               >
-                Quero Ser Parceiro
+                Quero Vender Energia (Parceiro)
               </button>
             </div>
           </div>
