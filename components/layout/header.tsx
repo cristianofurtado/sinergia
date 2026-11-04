@@ -3,21 +3,48 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, Zap, ChevronRight, Phone } from "lucide-react";
+import { Menu, X, Zap, ChevronRight, Phone, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Prevent background scroll when mobile menu is open
+  // Lock 100% of vertical and horizontal scrolling on mobile when menu is open
   useEffect(() => {
     if (mobileMenuOpen) {
+      const scrollY = window.scrollY;
+      document.documentElement.style.overflow = "hidden";
+      document.documentElement.style.touchAction = "none";
       document.body.style.overflow = "hidden";
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = "100%";
+      document.body.style.height = "100%";
+      document.body.style.touchAction = "none";
     } else {
-      document.body.style.overflow = "unset";
+      const scrollY = document.body.style.top;
+      document.documentElement.style.overflow = "";
+      document.documentElement.style.touchAction = "";
+      document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
+      document.body.style.height = "";
+      document.body.style.touchAction = "";
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY || "0") * -1);
+      }
     }
+
     return () => {
-      document.body.style.overflow = "unset";
+      document.documentElement.style.overflow = "";
+      document.documentElement.style.touchAction = "";
+      document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
+      document.body.style.height = "";
+      document.body.style.touchAction = "";
     };
   }, [mobileMenuOpen]);
 
@@ -25,13 +52,13 @@ export function Header() {
     { label: "Início", href: "#inicio" },
     { label: "Venda Energia", href: "#venda-energia" },
     { label: "Como Funciona", href: "#como-funciona" },
-    { label: "Simulador", href: "#simulador" },
-    { label: "Cobertura", href: "#cobertura" },
+    { label: "Simulador Oficial", href: "#simulador" },
+    { label: "Tabela de Descontos", href: "#tabela-descontos" },
     { label: "Contato", href: "#contato" },
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-blue-100/80 bg-white/95 backdrop-blur-md transition-all shadow-xs">
+    <header className="sticky top-0 z-40 w-full border-b border-blue-100/80 bg-white/95 backdrop-blur-md transition-all shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-18 sm:h-20">
           {/* Logo Oficial */}
@@ -84,58 +111,100 @@ export function Header() {
 
             <button
               type="button"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2.5 rounded-xl text-slate-700 bg-blue-50/80 border border-blue-200/80 hover:bg-blue-100 hover:text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-600 active:scale-95 transition-all"
-              aria-label={mobileMenuOpen ? "Fechar menu" : "Abrir menu"}
+              onClick={() => setMobileMenuOpen(true)}
+              className="p-2.5 rounded-xl text-slate-800 bg-blue-50 border border-blue-200 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-600 active:scale-95 transition-all"
+              aria-label="Abrir menu"
             >
-              {mobileMenuOpen ? (
-                <X className="w-6 h-6 text-slate-900" />
-              ) : (
-                <Menu className="w-6 h-6 text-slate-900" />
-              )}
+              <Menu className="w-6 h-6 text-slate-900" />
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Drawer Overlay */}
+      {/* Fullscreen Mobile Menu (Completely Fills Device Screen, Zero Scroll Leak) */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 top-[72px] sm:top-[80px] z-50 lg:hidden bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white border-b border-blue-100 px-5 pt-4 pb-8 space-y-4 shadow-2xl max-h-[calc(100vh-80px)] overflow-y-auto animate-in slide-in-from-top-4 duration-200">
-            <div className="space-y-1 divide-y divide-slate-100">
-              {navLinks.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between py-3.5 text-base font-bold text-slate-800 hover:text-blue-700 active:bg-blue-50/60 rounded-lg px-2 transition-colors"
-                >
-                  <span>{link.label}</span>
-                  <ChevronRight className="w-4 h-4 text-slate-400" />
-                </a>
-              ))}
-            </div>
+        <div
+          className="fixed inset-0 w-screen h-screen h-[100dvh] z-[9999] bg-white flex flex-col justify-between overflow-hidden touch-none animate-in fade-in zoom-in-95 duration-200"
+          style={{ overscrollBehavior: "none" }}
+        >
+          {/* Top Bar inside Fullscreen Menu */}
+          <div className="flex items-center justify-between px-5 h-18 border-b border-blue-100 bg-white shrink-0">
+            <Link
+              href="#inicio"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center"
+            >
+              <Image
+                src="/logo-oficial.png"
+                alt="Sinergia"
+                width={140}
+                height={38}
+                priority
+                className="h-8 w-auto object-contain"
+              />
+            </Link>
 
-            {/* Mobile Actions */}
-            <div className="pt-2 space-y-2.5">
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2.5 rounded-xl bg-slate-100 text-slate-800 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-600 active:scale-95 transition-all"
+              aria-label="Fechar menu"
+            >
+              <X className="w-6 h-6 text-slate-900" />
+            </button>
+          </div>
+
+          {/* Navigation Links List (Evenly spaced, large touchable rows) */}
+          <div className="flex-1 px-6 py-6 flex flex-col justify-center space-y-2">
+            {navLinks.map((link) => (
               <a
-                href="#simulador"
+                key={link.href}
+                href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="block"
+                className="flex items-center justify-between py-3.5 px-3 rounded-xl text-lg font-extrabold text-slate-800 hover:text-blue-700 hover:bg-blue-50/70 active:bg-blue-100/80 transition-colors"
               >
-                <Button variant="solar" size="lg" className="w-full text-slate-950 font-black shadow-sm py-3.5">
-                  <Zap className="w-4 h-4 fill-slate-950 mr-1.5" />
-                  SIMULAR ECONOMIA NA CONTA
-                </Button>
+                <span>{link.label}</span>
+                <ChevronRight className="w-5 h-5 text-blue-600" />
+              </a>
+            ))}
+          </div>
+
+          {/* Bottom Actions inside Fullscreen Menu */}
+          <div className="p-5 border-t border-blue-100 bg-slate-50/80 space-y-3 shrink-0">
+            <a
+              href="#simulador"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block"
+            >
+              <Button
+                variant="solar"
+                size="lg"
+                className="w-full text-slate-950 font-black shadow-md py-4 text-sm"
+              >
+                <Zap className="w-4 h-4 fill-slate-950 mr-1.5" />
+                SIMULAR ECONOMIA NA CONTA
+              </Button>
+            </a>
+
+            <div className="grid grid-cols-2 gap-2 text-center text-xs">
+              <a
+                href="https://wa.me/5571987822230"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-center gap-1.5 py-3 font-bold text-emerald-700 bg-emerald-50 rounded-xl border border-emerald-200 active:bg-emerald-100"
+              >
+                <MessageSquare className="w-4 h-4" />
+                WhatsApp
               </a>
 
               <a
-                href="#contato"
+                href="tel:+5571987822230"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block text-center py-2.5 text-xs font-bold text-blue-700 bg-blue-50/80 rounded-xl border border-blue-200"
+                className="flex items-center justify-center gap-1.5 py-3 font-bold text-blue-700 bg-blue-50 rounded-xl border border-blue-200 active:bg-blue-100"
               >
-                <Phone className="w-3.5 h-3.5 inline mr-1.5" />
-                Falar com Consultores no WhatsApp
+                <Phone className="w-4 h-4" />
+                Ligar Agora
               </a>
             </div>
           </div>
