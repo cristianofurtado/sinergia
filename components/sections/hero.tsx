@@ -8,7 +8,6 @@ import {
   BarChart3,
   ArrowRight,
   ShieldCheck,
-  Flame,
   CheckCircle2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -33,12 +32,6 @@ export function Hero() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           {/* Left Column: Clear, uncluttered headlines */}
           <div className="lg:col-span-7 space-y-4 sm:space-y-6" id="energia">
-            {/* Trust Pill */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-white text-[11px] sm:text-xs font-bold backdrop-blur-md shadow-xs">
-              <Flame className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-              <span>+1.600 usinas conectadas • Adesão 100% Gratuita</span>
-            </div>
-
             {/* Main Headline */}
             <div className="space-y-3">
               <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
