@@ -31,8 +31,7 @@ export function Contact() {
       phoneRaw: "5571987822230",
       phoneDisplay: "+55 (71) 98782-2230",
       region: "Bahia & Região Nordeste",
-      role: "Expansão & Mercado Livre de Energia",
-      initials: "CF",
+      role: "Expansão & Mercado Livre",
     },
     {
       name: "Renata Cereser",
@@ -41,7 +40,6 @@ export function Contact() {
       phoneDisplay: "+55 (11) 97227-4060",
       region: "São Paulo & Região Sudeste",
       role: "Consultoria B2B & Residencial",
-      initials: "RC",
     },
     {
       name: "Dani Fritzen",
@@ -49,8 +47,7 @@ export function Contact() {
       phoneRaw: "5551980584545",
       phoneDisplay: "+55 (51) 98058-4545",
       region: "Rio Grande do Sul & Região Sul",
-      role: "Parcerias, Corretores & Gestão",
-      initials: "DF",
+      role: "Parcerias & Corretores",
     },
   ];
 
@@ -60,7 +57,7 @@ export function Contact() {
 
     const msg =
       leadType === "client"
-        ? `Olá! Gostaria de receber uma proposta de economia de energia da Sinergia.\nNome: ${formData.name}\nWhatsApp: ${formData.phone}\nE-mail: ${formData.email}\nEstado: ${formData.state}\nValor aproximado da fatura: ${formData.billAmount}`
+        ? `Olá! Gostaria de receber uma proposta de economia de energia da Sinergia.\nNome: ${formData.name}\nWhatsApp: ${formData.phone}\nE-mail: ${formData.email}\nEstado: ${formData.state}\nValor da fatura: ${formData.billAmount}`
         : `Olá! Tenho interesse em atuar como parceiro/corretor de Venda de Energia da Sinergia.\nNome: ${formData.name}\nWhatsApp: ${formData.phone}\nE-mail: ${formData.email}\nEstado: ${formData.state}`;
 
     // Default contact: Cristiano Furtado
@@ -69,56 +66,51 @@ export function Contact() {
   };
 
   return (
-    <section id="contato" className="py-20 bg-gradient-to-b from-white via-blue-50/40 to-slate-50 border-b border-slate-200/80 relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+    <section id="contato" className="py-14 sm:py-20 bg-gradient-to-b from-blue-50/50 via-white to-blue-50/40 border-b border-blue-100 relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 sm:space-y-14">
         {/* Section Header */}
-        <div className="text-center space-y-3 max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-100/80 border border-blue-200 text-blue-800 text-xs font-bold uppercase tracking-wider">
+        <div className="text-center space-y-2.5 max-w-xl mx-auto">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100/80 border border-blue-200 text-blue-800 text-[11px] sm:text-xs font-bold uppercase tracking-wider">
             <Users className="w-3.5 h-3.5" />
-            Especialistas em Venda de Energia
+            EQUIPE DE ESPECIALISTAS
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight">
-            Fale com nossa equipe de Venda de Energia
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+            Fale com nossa equipe de Energia
           </h2>
-          <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
+          <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
             Atendimento direto para economizar na sua fatura ou se cadastrar como corretor parceiro de energia.
           </p>
         </div>
 
-        {/* 3 Dedicated Team Contact Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* 3 Dedicated Team Contact Cards - Clean & Compact for Mobile */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
           {teamMembers.map((member) => (
             <div
               key={member.name}
-              className="rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-7 shadow-card hover:border-blue-400 hover:shadow-elevation transition-all flex flex-col justify-between space-y-6 group"
+              className="rounded-2xl sm:rounded-3xl border border-blue-200/90 bg-white p-5 sm:p-6 shadow-card hover:border-blue-400 hover:shadow-elevation transition-all flex flex-col justify-between space-y-5"
             >
-              <div className="space-y-4">
-                {/* Header with Photo/Avatar & Live Status */}
+              <div className="space-y-3.5">
+                {/* Header with Photo & Live Status */}
                 <div className="flex items-center justify-between">
-                  {member.photo ? (
-                    <div className="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-amber-400 shadow-sm shrink-0">
-                      <Image
-                        src={member.photo}
-                        alt={member.name}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                  ) : (
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-700 to-blue-500 text-white font-black text-xl flex items-center justify-center shadow-sm shrink-0">
-                      {member.initials}
-                    </div>
-                  )}
+                  <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl overflow-hidden border-2 border-amber-400 shadow-xs shrink-0">
+                    <Image
+                      src={member.photo}
+                      alt={member.name}
+                      fill
+                      sizes="(max-width: 768px) 56px, 64px"
+                      className="object-cover"
+                    />
+                  </div>
 
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-semibold">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] sm:text-[11px] font-semibold">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                     Online no WhatsApp
                   </div>
                 </div>
 
                 {/* Name & Region */}
-                <div className="space-y-1">
-                  <h3 className="text-xl font-extrabold text-slate-900 group-hover:text-blue-900 transition-colors">
+                <div className="space-y-0.5">
+                  <h3 className="text-lg sm:text-xl font-extrabold text-slate-900">
                     {member.name}
                   </h3>
                   <span className="text-xs font-semibold text-amber-600 block">
@@ -132,7 +124,7 @@ export function Contact() {
               </div>
 
               {/* Action Buttons */}
-              <div className="space-y-2.5 pt-2 border-t border-slate-100">
+              <div className="space-y-2 pt-2 border-t border-slate-100">
                 <a
                   href={`https://wa.me/${member.phoneRaw}?text=${encodeURIComponent(
                     `Olá, ${member.name}! Gostaria de conversar sobre economia de energia e soluções da Sinergia.`
@@ -144,7 +136,7 @@ export function Contact() {
                   <Button
                     variant="solar"
                     size="md"
-                    className="w-full font-bold text-slate-950 shadow-xs hover:shadow"
+                    className="w-full font-bold text-slate-950 py-3 text-xs sm:text-sm shadow-xs hover:shadow"
                   >
                     <MessageSquare className="w-4 h-4 mr-1.5 fill-slate-950" />
                     Falar no WhatsApp
@@ -153,7 +145,7 @@ export function Contact() {
 
                 <a
                   href={`tel:${member.phoneDisplay.replace(/[^0-9+]/g, "")}`}
-                  className="block text-center py-2 text-xs font-semibold text-slate-600 hover:text-blue-900 transition-colors"
+                  className="block text-center py-1.5 text-xs font-semibold text-slate-600 hover:text-blue-900 transition-colors"
                 >
                   <Phone className="w-3.5 h-3.5 inline mr-1 text-slate-400" />
                   {member.phoneDisplay}
@@ -163,51 +155,51 @@ export function Contact() {
           ))}
         </div>
 
-        {/* Lead Capture Form / Quick Inquiry */}
-        <div className="max-w-3xl mx-auto rounded-3xl border border-slate-200/90 bg-white p-8 sm:p-10 shadow-card space-y-6">
-          <div className="text-center space-y-2">
-            <h3 className="text-2xl font-bold text-slate-900">
+        {/* Lead Capture Form - Compact & Responsive */}
+        <div className="max-w-2xl mx-auto rounded-2xl sm:rounded-3xl border border-blue-200/90 bg-white p-5 sm:p-8 shadow-card space-y-5">
+          <div className="text-center space-y-1">
+            <h3 className="text-xl sm:text-2xl font-bold text-slate-900">
               Prefere que a nossa equipe entre em contato?
             </h3>
             <p className="text-xs sm:text-sm text-slate-600">
-              Preencha o formulário abaixo e receba uma análise gratuita da sua fatura em até 1 hora.
+              Preencha abaixo e receba uma análise da sua fatura em até 1 hora.
             </p>
           </div>
 
           {/* Profile Switcher */}
           <div className="flex justify-center">
-            <div className="p-1 bg-slate-100 rounded-xl border border-slate-200 inline-flex max-w-sm w-full">
+            <div className="p-1 bg-slate-100 rounded-xl border border-slate-200 inline-flex w-full sm:w-auto">
               <button
                 type="button"
                 onClick={() => setLeadType("client")}
-                className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all ${
+                className={`flex-1 sm:flex-initial py-2 px-3 sm:px-4 rounded-lg text-xs font-bold transition-all ${
                   leadType === "client"
-                    ? "bg-amber-500 text-slate-950 shadow-sm"
+                    ? "bg-amber-500 text-slate-950 shadow-xs"
                     : "text-slate-600 hover:text-slate-900"
                 }`}
               >
-                Quero Economizar na Fatura
+                Quero Economizar
               </button>
               <button
                 type="button"
                 onClick={() => setLeadType("partner")}
-                className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all ${
+                className={`flex-1 sm:flex-initial py-2 px-3 sm:px-4 rounded-lg text-xs font-bold transition-all ${
                   leadType === "partner"
-                    ? "bg-amber-500 text-slate-950 shadow-sm"
+                    ? "bg-amber-500 text-slate-950 shadow-xs"
                     : "text-slate-600 hover:text-slate-900"
                 }`}
               >
-                Quero Vender Energia (Parceiro)
+                Quero Ser Parceiro
               </button>
             </div>
           </div>
 
           {submitted ? (
-            <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 text-center space-y-3">
-              <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto" />
-              <h4 className="text-lg font-bold text-slate-900">Mensagem Enviada!</h4>
+            <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 text-center space-y-2.5">
+              <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto" />
+              <h4 className="text-base font-bold text-slate-900">Mensagem Enviada!</h4>
               <p className="text-xs text-slate-600">
-                Você foi redirecionado para o nosso WhatsApp oficial com o consultor Cristiano Furtado. Entraremos em contato em breve.
+                Você foi redirecionado para o nosso WhatsApp com o consultor Cristiano Furtado. Responderemos prontamente.
               </p>
               <Button
                 variant="outline"
@@ -219,8 +211,8 @@ export function Contact() {
               </Button>
             </div>
           ) : (
-            <form onSubmit={handleFormSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <form onSubmit={handleFormSubmit} className="space-y-3.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-slate-700">
                     Nome / Empresa
@@ -231,7 +223,7 @@ export function Contact() {
                     placeholder="Seu nome ou Razão Social"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white text-sm"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white text-xs sm:text-sm"
                   />
                 </div>
 
@@ -245,12 +237,12 @@ export function Contact() {
                     placeholder="(71) 99999-9999"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white text-sm"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white text-xs sm:text-sm"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="sm:col-span-2 space-y-1">
                   <label className="text-xs font-semibold text-slate-700">
                     E-mail
@@ -261,7 +253,7 @@ export function Contact() {
                     placeholder="seuemail@empresa.com"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white text-sm"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white text-xs sm:text-sm"
                   />
                 </div>
 
@@ -272,7 +264,7 @@ export function Contact() {
                   <select
                     value={formData.state}
                     onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white text-sm"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white text-xs sm:text-sm"
                   >
                     <option value="BA">BA (20%)</option>
                     <option value="SP">SP (15%)</option>
@@ -292,14 +284,14 @@ export function Contact() {
               {leadType === "client" && (
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-slate-700">
-                    Valor médio da conta de luz mensal
+                    Valor médio da conta de luz (R$)
                   </label>
                   <input
                     type="text"
                     placeholder="Ex: R$ 690,00 ou R$ 5.000,00"
                     value={formData.billAmount}
                     onChange={(e) => setFormData({ ...formData, billAmount: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white text-sm"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white text-xs sm:text-sm"
                   />
                 </div>
               )}
@@ -308,15 +300,15 @@ export function Contact() {
                 type="submit"
                 variant="solar"
                 size="lg"
-                className="w-full font-extrabold text-slate-950 py-4 shadow-sm hover:shadow text-base mt-2"
+                className="w-full font-extrabold text-slate-950 py-3.5 shadow-xs hover:shadow text-xs sm:text-sm mt-1"
               >
-                <Send className="w-4 h-4 mr-2 fill-slate-950" />
+                <Send className="w-4 h-4 mr-1.5 fill-slate-950" />
                 ENVIAR DADOS & FALAR COM CONSULTOR
               </Button>
             </form>
           )}
 
-          <div className="flex items-center justify-center gap-4 text-[11px] text-slate-500 pt-2">
+          <div className="flex items-center justify-center gap-3 text-[11px] text-slate-500 pt-1">
             <span className="flex items-center gap-1">
               <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
               Sigilo garantido pela LGPD
