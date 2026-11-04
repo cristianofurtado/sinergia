@@ -98,44 +98,45 @@ export function Contact() {
           {teamMembers.map((member) => (
             <div
               key={member.name}
-              className="rounded-2xl sm:rounded-3xl border border-white/20 bg-[#ffffff] text-slate-900 p-5 sm:p-6 shadow-2xl hover:border-amber-400 hover:shadow-elevation transition-all flex flex-col justify-between space-y-5"
+              className="rounded-2xl sm:rounded-3xl border border-white/20 bg-[#ffffff] text-slate-900 p-5 sm:p-6 shadow-2xl hover:border-amber-400 hover:shadow-elevation transition-all flex flex-col justify-between space-y-4"
             >
-              <div className="space-y-3.5">
-                {/* Header with Photo & Live Status */}
-                <div className="flex items-center justify-between">
-                  <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl overflow-hidden border-2 border-amber-400 shadow-xs shrink-0">
+              <div className="space-y-3.5 text-center">
+                {/* Big Photo with Status Badge */}
+                <div className="relative mx-auto w-28 h-28 sm:w-32 sm:h-32">
+                  <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-amber-400 shadow-md">
                     <Image
                       src={member.photo}
                       alt={member.name}
                       fill
-                      sizes="(max-width: 768px) 56px, 64px"
+                      sizes="(max-width: 768px) 112px, 128px"
                       className="object-cover"
                     />
                   </div>
 
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] sm:text-[11px] font-semibold">
+                  {/* Online Badge */}
+                  <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 whitespace-nowrap inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-300 text-emerald-700 text-[10px] font-bold shadow-2xs">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    Online no WhatsApp
+                    Online
                   </div>
                 </div>
 
-                {/* Name & Region */}
-                <div className="space-y-0.5">
+                {/* Name & Role */}
+                <div className="space-y-0.5 pt-1">
                   <h3 className="text-lg sm:text-xl font-extrabold text-[#0e526c]">
                     {member.name}
                   </h3>
-                  <span className="text-xs font-semibold text-amber-600 block">
+                  <span className="text-xs font-bold text-amber-600 block">
                     {member.role}
                   </span>
-                  <p className="text-xs text-slate-500 flex items-center gap-1 pt-1 font-medium">
+                  <p className="text-xs text-slate-500 flex items-center justify-center gap-1 pt-0.5 font-medium">
                     <MapPin className="w-3.5 h-3.5 text-[#0e526c] shrink-0" />
                     {member.region}
                   </p>
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="space-y-2 pt-2 border-t border-slate-100">
+              {/* Action Buttons Repositioned Inside Card */}
+              <div className="space-y-2 pt-3 border-t border-slate-100">
                 <a
                   href={`https://wa.me/${member.phoneRaw}?text=${encodeURIComponent(
                     `Olá, ${member.name}! Gostaria de conversar sobre economia de energia e soluções da Sinergia.`
@@ -150,16 +151,16 @@ export function Contact() {
                     className="w-full font-bold text-slate-950 py-3 text-xs sm:text-sm shadow-xs hover:shadow"
                   >
                     <MessageSquare className="w-4 h-4 mr-1.5 fill-slate-950" />
-                    Falar no WhatsApp
+                    Conversar no WhatsApp
                   </Button>
                 </a>
 
                 <a
                   href={`tel:${member.phoneDisplay.replace(/[^0-9+]/g, "")}`}
-                  className="block text-center py-1.5 text-xs font-semibold text-slate-600 hover:text-[#0e526c] transition-colors"
+                  className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-[#f0f5f8] border border-slate-200 text-xs font-bold text-[#0e526c] hover:bg-[#eaf2f5] active:scale-98 transition-all"
                 >
-                  <Phone className="w-3.5 h-3.5 inline mr-1 text-slate-400" />
-                  {member.phoneDisplay}
+                  <Phone className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                  <span>{member.phoneDisplay}</span>
                 </a>
               </div>
             </div>
