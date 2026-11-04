@@ -20,6 +20,9 @@ export const metadata: Metadata = {
     "Transformação Digital",
   ],
   authors: [{ name: "Sinergia Tecnologia" }],
+  icons: {
+    icon: "/logo-oficial.png",
+  },
   robots: "index, follow",
   openGraph: {
     type: "website",

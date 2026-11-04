@@ -91,6 +91,48 @@ export default function LogosPage() {
           </Badge>
         </div>
 
+        {/* Official Brand Logo */}
+        <div className="bg-slate-900 text-white rounded-2xl p-6 sm:p-8 shadow-md space-y-4 border border-slate-800">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+            <div>
+              <span className="text-xs font-semibold uppercase tracking-wider text-amber-400">
+                Identidade Oficial Ativa
+              </span>
+              <h2 className="text-2xl font-bold text-white mt-0.5">
+                Logo Oficial Sinergia
+              </h2>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Arquivo fonte: <code>/dados/Projetos/Sinergia/logo-oficial.png</code> (1695×452px RGBA)
+              </p>
+            </div>
+            <a
+              href="/logo-oficial.png"
+              download="logo-oficial.png"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold bg-amber-500 hover:bg-amber-400 text-slate-950 px-3.5 py-2 rounded-lg transition-colors font-medium self-start sm:self-auto"
+            >
+              <Download className="w-4 h-4" />
+              Baixar Logo Oficial (PNG HD)
+            </a>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center pt-2">
+            <div className="bg-white p-6 rounded-xl flex items-center justify-center shadow-inner">
+              <img
+                src="/logo-oficial.png"
+                alt="Logo Oficial Sinergia"
+                className="max-h-14 w-auto object-contain"
+              />
+            </div>
+            <div className="bg-slate-950 p-6 rounded-xl flex items-center justify-center border border-slate-800">
+              <img
+                src="/logo-oficial.png"
+                alt="Logo Oficial Sinergia (Dark)"
+                className="max-h-14 w-auto object-contain"
+              />
+            </div>
+          </div>
+        </div>
+
         {/* Logos Grid */}
         <div className="space-y-12">
           {logos.map((logo, index) => (

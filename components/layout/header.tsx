@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Menu, X, ArrowUpRight, Cpu } from "lucide-react";
+import Image from "next/image";
+import { Menu, X, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function Header() {
@@ -22,18 +23,15 @@ export function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-10 h-10 rounded-lg bg-slate-900 flex items-center justify-center text-white shadow-sm group-hover:bg-brand-600 transition-colors">
-              <Cpu className="w-5 h-5" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xl font-bold tracking-tight text-slate-900 group-hover:text-brand-700 transition-colors">
-                SINERGIA
-              </span>
-              <span className="text-[10px] uppercase tracking-widest font-semibold text-slate-500">
-                Tecnologia B2B
-              </span>
-            </div>
+          <Link href="/" className="flex items-center group">
+            <Image
+              src="/logo-oficial.png"
+              alt="Sinergia"
+              width={160}
+              height={43}
+              priority
+              className="h-10 w-auto object-contain transition-opacity group-hover:opacity-90"
+            />
           </Link>
 
           {/* Desktop Navigation */}

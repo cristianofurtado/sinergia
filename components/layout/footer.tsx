@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
-import { Cpu, ShieldCheck } from "lucide-react";
+import Image from "next/image";
+import { ShieldCheck } from "lucide-react";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -11,14 +12,15 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           {/* Brand Info */}
           <div className="md:col-span-2 space-y-4">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-white">
-                <Cpu className="w-4 h-4" />
-              </div>
-              <span className="text-lg font-bold tracking-tight text-slate-900">
-                SINERGIA
-              </span>
-            </div>
+            <Link href="/" className="inline-block">
+              <Image
+                src="/logo-oficial.png"
+                alt="Sinergia"
+                width={150}
+                height={40}
+                className="h-9 w-auto object-contain"
+              />
+            </Link>
             <p className="text-sm text-slate-500 max-w-sm leading-relaxed">
               Engenharia de software de alto impacto, arquiteturas escaláveis em
               nuvem e soluções avançadas de inteligência artificial para médias e
