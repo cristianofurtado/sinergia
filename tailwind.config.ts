@@ -8,6 +8,25 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        sinergia: {
+          dark: "#0e526c",
+          slate: "#284b63",
+          white: "#ffffff",
+          deep: "#083747",
+          light: "#eaf2f5",
+          ice: "#f3f7f9",
+          50: "#f0f5f8",
+          100: "#dbe8ed",
+          200: "#b8d1dc",
+          300: "#8eb6c7",
+          400: "#5589a1",
+          500: "#284b63",
+          600: "#1f3e53",
+          700: "#163143",
+          800: "#0e526c",
+          900: "#093849",
+          950: "#05222d",
+        },
         navy: {
           950: "#040914",
           900: "#070F1E",

@@ -58,7 +58,7 @@ export function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-blue-100/80 bg-white/95 backdrop-blur-md transition-all shadow-xs">
+    <header className="sticky top-0 z-40 w-full border-b border-[#0e526c]/15 bg-white/95 backdrop-blur-md transition-all shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-18 lg:h-20">
           {/* Logo Oficial */}
@@ -79,7 +79,7 @@ export function Header() {
               <a
                 key={link.href}
                 href={link.href}
-                className="text-sm font-semibold text-slate-600 hover:text-blue-700 transition-colors py-1"
+                className="text-sm font-bold text-[#0e526c] hover:text-amber-500 transition-colors py-1"
               >
                 {link.label}
               </a>
@@ -116,10 +116,10 @@ export function Header() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(true)}
-              className="p-2 rounded-xl text-slate-800 bg-blue-50/80 border border-blue-200 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-600 active:scale-95 transition-all h-9 w-9 flex items-center justify-center"
+              className="p-2 rounded-xl text-[#0e526c] bg-[#eaf2f5] border border-[#284b63]/20 hover:bg-[#dbe8ed] focus:outline-none focus:ring-2 focus:ring-[#0e526c] active:scale-95 transition-all h-9 w-9 flex items-center justify-center"
               aria-label="Abrir menu"
             >
-              <Menu className="w-5 h-5 text-slate-900" />
+              <Menu className="w-5 h-5 text-[#0e526c]" />
             </button>
           </div>
         </div>
@@ -132,7 +132,7 @@ export function Header() {
           style={{ overscrollBehavior: "none" }}
         >
           {/* Top Bar inside Fullscreen Menu */}
-          <div className="flex items-center justify-between px-4 sm:px-6 h-16 border-b border-blue-100 bg-white shrink-0">
+          <div className="flex items-center justify-between px-4 sm:px-6 h-16 border-b border-[#0e526c]/15 bg-white shrink-0">
             <Link
               href="#inicio"
               onClick={() => setMobileMenuOpen(false)}
@@ -151,7 +151,7 @@ export function Header() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(false)}
-              className="p-2 rounded-xl bg-slate-100 text-slate-800 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-600 active:scale-95 transition-all h-9 w-9 flex items-center justify-center"
+              className="p-2 rounded-xl bg-slate-100 text-slate-800 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-[#0e526c] active:scale-95 transition-all h-9 w-9 flex items-center justify-center"
               aria-label="Fechar menu"
             >
               <X className="w-5 h-5 text-slate-900" />
@@ -165,7 +165,7 @@ export function Header() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-between py-3 px-3.5 rounded-xl text-base font-bold text-slate-800 hover:text-blue-700 hover:bg-blue-50/70 active:bg-blue-100/80 transition-colors"
+                className="flex items-center justify-between py-3 px-3.5 rounded-xl text-base font-bold text-[#0e526c] hover:text-amber-500 hover:bg-[#eaf2f5] active:bg-[#dbe8ed] transition-colors"
               >
                 <span>{link.label}</span>
                 <ChevronRight className="w-4 h-4 text-amber-500" />

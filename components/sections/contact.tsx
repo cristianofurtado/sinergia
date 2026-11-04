@@ -66,28 +66,31 @@ export function Contact() {
   };
 
   return (
-    <section id="contato" className="py-14 sm:py-20 bg-gradient-to-b from-blue-50/50 via-white to-blue-50/40 border-b border-blue-100 relative">
+    <section
+      id="contato"
+      className="py-14 sm:py-22 bg-gradient-to-b from-[#0e526c] via-[#1a4157] to-[#284b63] text-white border-b border-[#0e526c] relative"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 sm:space-y-14">
         {/* Section Header */}
         <div className="text-center space-y-2.5 max-w-xl mx-auto">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100/80 border border-blue-200 text-blue-800 text-[11px] sm:text-xs font-bold uppercase tracking-wider">
-            <Users className="w-3.5 h-3.5" />
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-white text-[11px] sm:text-xs font-bold uppercase tracking-wider backdrop-blur-md shadow-xs">
+            <Users className="w-3.5 h-3.5 text-amber-400" />
             EQUIPE DE ESPECIALISTAS
           </div>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
             Fale com nossa equipe de Energia
           </h2>
-          <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
+          <p className="text-sky-100 text-xs sm:text-sm leading-relaxed">
             Atendimento direto para economizar na sua fatura ou se cadastrar como corretor parceiro de energia.
           </p>
         </div>
 
-        {/* 3 Dedicated Team Contact Cards - Clean & Compact for Mobile */}
+        {/* 3 Dedicated Team Contact Cards - Pure White for maximum contrast & crispness */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
           {teamMembers.map((member) => (
             <div
               key={member.name}
-              className="rounded-2xl sm:rounded-3xl border border-blue-200/90 bg-white p-5 sm:p-6 shadow-card hover:border-blue-400 hover:shadow-elevation transition-all flex flex-col justify-between space-y-5"
+              className="rounded-2xl sm:rounded-3xl border border-white/20 bg-[#ffffff] text-slate-900 p-5 sm:p-6 shadow-2xl hover:border-amber-400 hover:shadow-elevation transition-all flex flex-col justify-between space-y-5"
             >
               <div className="space-y-3.5">
                 {/* Header with Photo & Live Status */}
@@ -110,14 +113,14 @@ export function Contact() {
 
                 {/* Name & Region */}
                 <div className="space-y-0.5">
-                  <h3 className="text-lg sm:text-xl font-extrabold text-slate-900">
+                  <h3 className="text-lg sm:text-xl font-extrabold text-[#0e526c]">
                     {member.name}
                   </h3>
                   <span className="text-xs font-semibold text-amber-600 block">
                     {member.role}
                   </span>
                   <p className="text-xs text-slate-500 flex items-center gap-1 pt-1 font-medium">
-                    <MapPin className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                    <MapPin className="w-3.5 h-3.5 text-[#0e526c] shrink-0" />
                     {member.region}
                   </p>
                 </div>
@@ -145,7 +148,7 @@ export function Contact() {
 
                 <a
                   href={`tel:${member.phoneDisplay.replace(/[^0-9+]/g, "")}`}
-                  className="block text-center py-1.5 text-xs font-semibold text-slate-600 hover:text-blue-900 transition-colors"
+                  className="block text-center py-1.5 text-xs font-semibold text-slate-600 hover:text-[#0e526c] transition-colors"
                 >
                   <Phone className="w-3.5 h-3.5 inline mr-1 text-slate-400" />
                   {member.phoneDisplay}
@@ -155,10 +158,10 @@ export function Contact() {
           ))}
         </div>
 
-        {/* Lead Capture Form - Compact & Responsive */}
-        <div className="max-w-2xl mx-auto rounded-2xl sm:rounded-3xl border border-blue-200/90 bg-white p-5 sm:p-8 shadow-card space-y-5">
+        {/* Lead Capture Form - Crisp White Card */}
+        <div className="max-w-2xl mx-auto rounded-2xl sm:rounded-3xl border border-white/20 bg-[#ffffff] text-slate-900 p-5 sm:p-8 shadow-2xl space-y-5">
           <div className="text-center space-y-1">
-            <h3 className="text-xl sm:text-2xl font-bold text-slate-900">
+            <h3 className="text-xl sm:text-2xl font-bold text-[#0e526c]">
               Prefere que a nossa equipe entre em contato?
             </h3>
             <p className="text-xs sm:text-sm text-slate-600">
@@ -168,14 +171,14 @@ export function Contact() {
 
           {/* Profile Switcher */}
           <div className="flex justify-center">
-            <div className="p-1 bg-slate-100 rounded-xl border border-slate-200 inline-flex w-full sm:w-auto">
+            <div className="p-1 bg-[#f0f5f8] rounded-xl border border-slate-200 inline-flex w-full sm:w-auto">
               <button
                 type="button"
                 onClick={() => setLeadType("client")}
                 className={`flex-1 sm:flex-initial py-2 px-3 sm:px-4 rounded-lg text-xs font-bold transition-all ${
                   leadType === "client"
                     ? "bg-amber-500 text-slate-950 shadow-xs"
-                    : "text-slate-600 hover:text-slate-900"
+                    : "text-slate-600 hover:text-[#0e526c]"
                 }`}
               >
                 Quero Economizar
@@ -186,7 +189,7 @@ export function Contact() {
                 className={`flex-1 sm:flex-initial py-2 px-3 sm:px-4 rounded-lg text-xs font-bold transition-all ${
                   leadType === "partner"
                     ? "bg-amber-500 text-slate-950 shadow-xs"
-                    : "text-slate-600 hover:text-slate-900"
+                    : "text-slate-600 hover:text-[#0e526c]"
                 }`}
               >
                 Quero Ser Parceiro
@@ -223,7 +226,7 @@ export function Contact() {
                     placeholder="Seu nome ou Razão Social"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white text-xs sm:text-sm"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-[#f0f5f8] text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0e526c] focus:bg-white text-xs sm:text-sm"
                   />
                 </div>
 
@@ -237,7 +240,7 @@ export function Contact() {
                     placeholder="(71) 99999-9999"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white text-xs sm:text-sm"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-[#f0f5f8] text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0e526c] focus:bg-white text-xs sm:text-sm"
                   />
                 </div>
               </div>
@@ -253,7 +256,7 @@ export function Contact() {
                     placeholder="seuemail@empresa.com"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white text-xs sm:text-sm"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-[#f0f5f8] text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0e526c] focus:bg-white text-xs sm:text-sm"
                   />
                 </div>
 
@@ -264,19 +267,27 @@ export function Contact() {
                   <select
                     value={formData.state}
                     onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white text-xs sm:text-sm"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-[#f0f5f8] text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0e526c] focus:bg-white text-xs sm:text-sm cursor-pointer"
                   >
-                    <option value="BA">BA (20%)</option>
-                    <option value="SP">SP (15%)</option>
-                    <option value="RS">RS (15%)</option>
-                    <option value="MG">MG (26%)</option>
-                    <option value="GO">GO (25%)</option>
-                    <option value="MT">MT (25%)</option>
-                    <option value="CE">CE (20%)</option>
-                    <option value="PR">PR (16%)</option>
-                    <option value="RJ">RJ (12% a 15%)</option>
-                    <option value="SC">SC (15%)</option>
-                    <option value="Outro">Outro Estado</option>
+                    <option value="MG">MG — CEMIG (26%)</option>
+                    <option value="GO">GO — Equatorial GO (25%)</option>
+                    <option value="MT">MT — Energisa MT (25%)</option>
+                    <option value="MS">MS — Energisa MS (23%)</option>
+                    <option value="CE">CE — Enel CE (20%)</option>
+                    <option value="BA">BA — Neoenergia Coelba (18%)</option>
+                    <option value="RN">RN — Neoenergia Cosern (18%)</option>
+                    <option value="AL">AL — Equatorial AL (18%)</option>
+                    <option value="MA">MA — Equatorial MA (18%)</option>
+                    <option value="PI">PI — Equatorial PI (18%)</option>
+                    <option value="PA">PA — Equatorial PA (18%)</option>
+                    <option value="PE">PE — Neoenergia Celpe (16%)</option>
+                    <option value="SP">SP — CPFL / Elektro (15%)</option>
+                    <option value="RJ">RJ — Light / Enel RJ (15%)</option>
+                    <option value="ES">ES — EDP ES (15%)</option>
+                    <option value="PR">PR — Copel (15%)</option>
+                    <option value="SC">SC — Celesc (15%)</option>
+                    <option value="RS">RS — RGE / Equatorial (15%)</option>
+                    <option value="Outro">Outro Estado / Mercado Livre</option>
                   </select>
                 </div>
               </div>
@@ -291,7 +302,7 @@ export function Contact() {
                     placeholder="Ex: R$ 690,00 ou R$ 5.000,00"
                     value={formData.billAmount}
                     onChange={(e) => setFormData({ ...formData, billAmount: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white text-xs sm:text-sm"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-[#f0f5f8] text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0e526c] focus:bg-white text-xs sm:text-sm"
                   />
                 </div>
               )}
@@ -300,7 +311,7 @@ export function Contact() {
                 type="submit"
                 variant="solar"
                 size="lg"
-                className="w-full font-extrabold text-slate-950 py-3.5 shadow-xs hover:shadow text-xs sm:text-sm mt-1"
+                className="w-full font-extrabold text-slate-950 py-3.5 shadow-md hover:shadow-lg text-xs sm:text-sm mt-1"
               >
                 <Send className="w-4 h-4 mr-1.5 fill-slate-950" />
                 ENVIAR DADOS & FALAR COM CONSULTOR
@@ -310,7 +321,7 @@ export function Contact() {
 
           <div className="flex items-center justify-center gap-3 text-[11px] text-slate-500 pt-1">
             <span className="flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+              <ShieldCheck className="w-3.5 h-3.5 text-[#0e526c]" />
               Sigilo garantido pela LGPD
             </span>
             <span>•</span>

@@ -11,7 +11,6 @@ import {
   Wrench,
   Users,
   Percent,
-  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -82,31 +81,34 @@ export function Simulator() {
   return (
     <section
       id="simulador"
-      className="py-14 sm:py-20 bg-gradient-to-b from-blue-50/70 via-white to-blue-50/40 border-b border-blue-100 relative overflow-hidden"
+      className="py-14 sm:py-22 bg-gradient-to-b from-[#284b63] via-[#1a4157] to-[#0e526c] border-b border-[#0e526c] relative overflow-hidden text-white"
     >
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 sm:space-y-16">
+      {/* Background Radial Glow */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[750px] h-[450px] bg-gradient-radial from-[#0e526c]/40 via-transparent to-transparent blur-3xl pointer-events-none -z-10" />
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 sm:space-y-14">
         {/* Section Header */}
-        <div className="text-center space-y-3 max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-blue-100/90 border border-blue-200 text-blue-800 text-[11px] sm:text-xs font-bold uppercase tracking-wider">
-            <Calculator className="w-3.5 h-3.5 text-blue-700" />
+        <div className="text-center space-y-2.5 max-w-2xl mx-auto">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-white text-[11px] sm:text-xs font-bold uppercase tracking-wider backdrop-blur-md shadow-xs">
+            <Calculator className="w-3.5 h-3.5 text-amber-400" />
             SIMULADOR OFICIAL
           </div>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
             Descubra o valor do seu desconto real
           </h2>
-          <p className="text-slate-600 text-xs sm:text-sm">
+          <p className="text-sky-100 text-xs sm:text-sm">
             Simule na hora quanto você ou sua empresa vão economizar todo mês na conta de luz.
           </p>
         </div>
 
-        {/* Simulator Card */}
+        {/* Simulator Card - Pure White with Crisp Petrol Accents */}
         <div
           id="simulador-card"
-          className="max-w-4xl mx-auto rounded-2xl sm:rounded-3xl border border-blue-200/90 bg-white p-5 sm:p-9 shadow-card space-y-6 sm:space-y-7 relative"
+          className="max-w-4xl mx-auto rounded-2xl sm:rounded-3xl border border-white/20 bg-[#ffffff] text-slate-900 p-5 sm:p-9 shadow-2xl space-y-6 sm:space-y-7 relative"
         >
           {/* Profile Switcher */}
           <div className="flex justify-center">
-            <div className="p-1 bg-slate-100 rounded-xl sm:rounded-2xl border border-slate-200 inline-flex w-full sm:w-auto">
+            <div className="p-1 bg-[#f0f5f8] rounded-xl sm:rounded-2xl border border-slate-200 inline-flex w-full sm:w-auto">
               <button
                 type="button"
                 onClick={() => {
@@ -116,7 +118,7 @@ export function Simulator() {
                 className={`flex-1 sm:flex-initial py-2 px-3 sm:px-6 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold transition-all ${
                   profile === "b2c"
                     ? "bg-amber-500 text-slate-950 shadow-xs"
-                    : "text-slate-600 hover:text-slate-900"
+                    : "text-slate-600 hover:text-[#0e526c]"
                 }`}
               >
                 Para Minha Casa (B2C)
@@ -130,7 +132,7 @@ export function Simulator() {
                 className={`flex-1 sm:flex-initial py-2 px-3 sm:px-6 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold transition-all ${
                   profile === "b2b"
                     ? "bg-amber-500 text-slate-950 shadow-xs"
-                    : "text-slate-600 hover:text-slate-900"
+                    : "text-slate-600 hover:text-[#0e526c]"
                 }`}
               >
                 Para Minha Empresa (B2B)
@@ -143,12 +145,12 @@ export function Simulator() {
             <div className="flex items-center justify-between">
               <label
                 htmlFor={selectId}
-                className="text-xs sm:text-sm font-bold text-slate-800 flex items-center gap-1.5"
+                className="text-xs sm:text-sm font-bold text-[#0e526c] flex items-center gap-1.5"
               >
                 <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
                 Selecione sua Concessionária / Região:
               </label>
-              <span className="text-[11px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-full">
+              <span className="text-[11px] font-bold text-[#0e526c] bg-[#eaf2f5] border border-[#284b63]/20 px-2.5 py-0.5 rounded-full">
                 Desconto: {selectedDistributor.rateLabel}
               </span>
             </div>
@@ -158,7 +160,7 @@ export function Simulator() {
                 id={selectId}
                 value={distributorId}
                 onChange={(e) => setDistributorId(e.target.value)}
-                className="w-full py-2.5 px-3.5 rounded-xl border border-blue-200 bg-white text-slate-900 font-semibold text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent shadow-xs transition-all cursor-pointer"
+                className="w-full py-2.5 px-3.5 rounded-xl border border-slate-300 bg-white text-slate-900 font-semibold text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#0e526c] focus:border-transparent shadow-2xs transition-all cursor-pointer"
               >
                 <option value="destaque">
                   ★ Destaque Oficial Sinergia (Desconto Promocional do App)
@@ -203,7 +205,7 @@ export function Simulator() {
               <span className="text-xs sm:text-sm font-semibold text-slate-700">
                 Valor da sua conta atual:
               </span>
-              <span className="text-xl sm:text-2xl font-black text-blue-900 font-mono">
+              <span className="text-xl sm:text-2xl font-black text-[#0e526c] font-mono">
                 R$ {fatura.toLocaleString("pt-BR")},00
               </span>
             </div>
@@ -227,11 +229,11 @@ export function Simulator() {
 
           {/* Results Grid - Official Values */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-slate-100">
-            <div className="rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-200/90 p-3.5 sm:p-4 text-center space-y-0.5">
+            <div className="rounded-xl sm:rounded-2xl bg-[#f0f5f8] border border-[#284b63]/15 p-3.5 sm:p-4 text-center space-y-0.5">
               <span className="text-[11px] text-slate-500 font-medium block">
                 Fatura com Sinergia
               </span>
-              <span className="text-xl sm:text-2xl font-black text-slate-900 block font-mono">
+              <span className="text-xl sm:text-2xl font-black text-[#0e526c] block font-mono">
                 R$ {novaFatura.toLocaleString("pt-BR")},00
               </span>
               <span className="text-[10px] text-emerald-600 font-semibold block">
@@ -239,7 +241,7 @@ export function Simulator() {
               </span>
             </div>
 
-            <div className="rounded-xl sm:rounded-2xl bg-amber-50/90 border border-amber-300 p-3.5 sm:p-4 text-center space-y-0.5 shadow-xs">
+            <div className="rounded-xl sm:rounded-2xl bg-amber-50 border border-amber-300 p-3.5 sm:p-4 text-center space-y-0.5 shadow-2xs">
               <span className="text-[11px] text-amber-800 font-semibold block">
                 Desconto mensal estimado
               </span>
@@ -251,14 +253,14 @@ export function Simulator() {
               </span>
             </div>
 
-            <div className="rounded-xl sm:rounded-2xl bg-blue-50/90 border border-blue-200 p-3.5 sm:p-4 text-center space-y-0.5">
-              <span className="text-[11px] text-blue-700 font-medium block">
+            <div className="rounded-xl sm:rounded-2xl bg-[#eaf2f5] border border-[#284b63]/20 p-3.5 sm:p-4 text-center space-y-0.5">
+              <span className="text-[11px] text-[#0e526c] font-medium block">
                 Economia em 1 ano
               </span>
-              <span className="text-xl sm:text-2xl font-black text-blue-950 block font-mono">
+              <span className="text-xl sm:text-2xl font-black text-[#0e526c] block font-mono">
                 R$ {economiaAno.toLocaleString("pt-BR")},00
               </span>
-              <span className="text-[10px] text-blue-600 font-semibold block">
+              <span className="text-[10px] text-[#284b63] font-semibold block">
                 Em 5 anos: R$ {economia5Anos.toLocaleString("pt-BR")},00
               </span>
             </div>
@@ -279,7 +281,7 @@ export function Simulator() {
               <Button
                 variant="solar"
                 size="lg"
-                className="w-full sm:w-auto font-black text-slate-950 text-sm sm:text-base py-3.5 px-7 shadow-sm"
+                className="w-full sm:w-auto font-black text-slate-950 text-sm sm:text-base py-3.5 px-7 shadow-md"
               >
                 QUERO GARANTIR ESTE DESCONTO AGORA
                 <ArrowRight className="w-4 h-4 ml-2" />
@@ -297,7 +299,7 @@ export function Simulator() {
         <div id="cobertura" className="scroll-mt-24" />
         <div
           id="tabela-descontos"
-          className="rounded-3xl border border-blue-200 bg-white p-5 sm:p-10 shadow-card space-y-6 sm:space-y-8 scroll-mt-24"
+          className="rounded-3xl border border-white/20 bg-[#ffffff] text-slate-900 p-5 sm:p-10 shadow-2xl space-y-6 sm:space-y-8 scroll-mt-24"
         >
           {/* Header of the Official Table */}
           <div className="text-center space-y-3 max-w-3xl mx-auto">
@@ -310,7 +312,7 @@ export function Simulator() {
                 className="h-9 w-auto object-contain"
               />
             </div>
-            <h3 className="text-xl sm:text-3xl font-black text-slate-900 tracking-tight uppercase">
+            <h3 className="text-xl sm:text-3xl font-black text-[#0e526c] tracking-tight uppercase">
               CONFIRA A TABELA ATUALIZADA DE DESCONTOS PARA{" "}
               <span className="text-amber-500">NOVOS CLIENTES</span>
             </h3>
@@ -322,7 +324,7 @@ export function Simulator() {
           {/* 2-Column Table */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-8 pt-2">
             {/* Column 1 */}
-            <div className="bg-slate-50/80 rounded-2xl p-4 sm:p-5 border border-slate-200 space-y-2.5">
+            <div className="bg-[#f0f5f8] rounded-2xl p-4 sm:p-5 border border-slate-200 space-y-2">
               {[
                 { name: "ENEL CEARÁ", rate: "20%", id: "enel-ce" },
                 { name: "NEOENERGIA COSERN", rate: "18%", id: "neoenergia-cosern" },
@@ -351,7 +353,7 @@ export function Simulator() {
                     {item.name}
                   </span>
                   <div className="flex-1 mx-2 sm:mx-3 border-b border-dotted border-slate-300" />
-                  <span className="font-extrabold text-blue-900 shrink-0 font-mono text-sm sm:text-base">
+                  <span className="font-extrabold text-[#0e526c] shrink-0 font-mono text-sm sm:text-base">
                     {item.rate}
                   </span>
                 </button>
@@ -359,7 +361,7 @@ export function Simulator() {
             </div>
 
             {/* Column 2 */}
-            <div className="bg-slate-50/80 rounded-2xl p-4 sm:p-5 border border-slate-200 space-y-2.5">
+            <div className="bg-[#f0f5f8] rounded-2xl p-4 sm:p-5 border border-slate-200 space-y-2">
               {[
                 { name: "CEMIG MG", rate: "26%", id: "cemig-mg" },
                 { name: "CPFL PAULISTA", rate: "15%", id: "cpfl-paulista" },
@@ -388,7 +390,7 @@ export function Simulator() {
                     {item.name}
                   </span>
                   <div className="flex-1 mx-2 sm:mx-3 border-b border-dotted border-slate-300" />
-                  <span className="font-extrabold text-blue-900 shrink-0 font-mono text-sm sm:text-base">
+                  <span className="font-extrabold text-[#0e526c] shrink-0 font-mono text-sm sm:text-base">
                     {item.rate}
                   </span>
                 </button>
@@ -397,7 +399,7 @@ export function Simulator() {
           </div>
 
           {/* Broker Disclaimer */}
-          <div className="p-4 rounded-xl bg-blue-50/90 border border-blue-200 text-center max-w-3xl mx-auto space-y-1">
+          <div className="p-4 rounded-xl bg-[#eaf2f5] border border-[#284b63]/20 text-center max-w-3xl mx-auto space-y-1">
             <p className="text-xs sm:text-sm text-slate-800 font-medium leading-relaxed">
               A <strong>SINERGIA</strong> é uma corretora que conecta clientes e geradoras,
               conseguindo sempre o melhor desconto para você.
