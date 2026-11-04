@@ -93,6 +93,12 @@ export function Footer() {
                   +55 (51) 98058-4545 (RS / Sul)
                 </a>
               </li>
+              <li>
+                <strong className="text-white block font-semibold">Eliene Matos</strong>
+                <a href="tel:+5511966413480" className="text-sky-200 hover:text-white transition-colors">
+                  +55 (11) 96641-3480 (SP / Sudeste)
+                </a>
+              </li>
             </ul>
           </div>
 

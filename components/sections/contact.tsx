@@ -49,6 +49,14 @@ export function Contact() {
       region: "Rio Grande do Sul & Região Sul",
       role: "Parcerias & Corretores",
     },
+    {
+      name: "Eliene Matos",
+      photo: "/eliene-matos.jpg",
+      phoneRaw: "5511966413480",
+      phoneDisplay: "+55 (11) 96641-3480",
+      region: "São Paulo & Região Sudeste",
+      role: "Consultoria Comercial & B2C",
+    },
   ];
 
   const handleFormSubmit = (e: React.FormEvent) => {
@@ -85,8 +93,8 @@ export function Contact() {
           </p>
         </div>
 
-        {/* 3 Dedicated Team Contact Cards - Pure White for maximum contrast & crispness */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+        {/* Dedicated Team Contact Cards - Pure White for maximum contrast & crispness */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
           {teamMembers.map((member) => (
             <div
               key={member.name}
