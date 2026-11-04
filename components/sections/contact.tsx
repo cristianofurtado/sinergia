@@ -36,7 +36,7 @@ export function Contact() {
     },
     {
       name: "Renata Cereser",
-      photo: null,
+      photo: "/renata-cereser.jpg",
       phoneRaw: "5511972274060",
       phoneDisplay: "+55 (11) 97227-4060",
       region: "São Paulo & Região Sudeste",
@@ -45,7 +45,7 @@ export function Contact() {
     },
     {
       name: "Dani Fritzen",
-      photo: null,
+      photo: "/dani-fritzen.jpg",
       phoneRaw: "5551980584545",
       phoneDisplay: "+55 (51) 98058-4545",
       region: "Rio Grande do Sul & Região Sul",
