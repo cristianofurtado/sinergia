@@ -7,19 +7,21 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Sinergia | Engenharia, Inovação e Soluções Digitais B2B",
+  title: "SINERGIA | Economia de Energia, Mercado Livre & Ecossistema de Gestão",
   description:
-    "Transformamos desafios tecnológicos complexos em vantagem competitiva durável com engenharia de software de ponta, arquitetura cloud e IA aplicada.",
+    "Economize de 10% a 30% na sua fatura de energia sem obras ou investimentos. Estrutura digital completa para clientes B2B, B2C, Corretores e Líderes.",
   keywords: [
     "Sinergia",
-    "Engenharia de Software",
-    "Cloud Architecture",
-    "Inteligência Artificial B2B",
-    "DevOps",
-    "Consultoria Tecnológica",
-    "Transformação Digital",
+    "Economia de Energia",
+    "Geração Distribuída",
+    "Mercado Livre de Energia",
+    "Energia Solar",
+    "Redução de Conta de Luz",
+    "Venda Energia",
+    "Corretores de Energia",
+    "Gestão B2B e B2C",
   ],
-  authors: [{ name: "Sinergia Tecnologia" }],
+  authors: [{ name: "Sinergia" }],
   icons: {
     icon: "/logo-oficial.png",
   },
@@ -28,9 +30,9 @@ export const metadata: Metadata = {
     type: "website",
     locale: "pt_BR",
     url: "https://sinergia.tech",
-    title: "Sinergia | Engenharia, Inovação e Soluções Digitais B2B",
+    title: "SINERGIA | Economia de Energia & Oportunidade de Negócio",
     description:
-      "Transformamos desafios tecnológicos complexos em vantagem competitiva durável com engenharia de software de ponta.",
+      "Economize de 10% a 30% na fatura de energia. Sem obras, sem custo de adesão e 100% digital.",
     siteName: "Sinergia",
   },
 };
@@ -42,7 +44,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className="scroll-smooth">
-      <body className="min-h-screen bg-surface-subtle text-slate-900 font-sans antialiased selection:bg-brand-100 selection:text-brand-900">
+      <body className="min-h-screen bg-surface-subtle text-slate-900 font-sans antialiased selection:bg-solar-100 selection:text-solar-900">
         {children}
       </body>
     </html>
