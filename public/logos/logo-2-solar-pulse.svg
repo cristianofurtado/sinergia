@@ -1,0 +1,52 @@
+<svg width="400" height="150" viewBox="0 0 400 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradiente do Sol & Horizonte -->
+    <linearGradient id="l2-sun" x1="40" y1="95" x2="105" y2="40" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#EA580C"/>
+      <stop offset="50%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#FBBF24"/>
+    </linearGradient>
+
+    <!-- Gradiente do Raio de Visão Futura -->
+    <linearGradient id="l2-beam" x1="45" y1="85" x2="120" y2="50" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0284C7"/>
+      <stop offset="100%" stop-color="#06B6D4"/>
+    </linearGradient>
+
+    <!-- Arco de Órbita -->
+    <linearGradient id="l2-orbit" x1="30" y1="100" x2="120" y2="40" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#94A3B8" stop-opacity="0.2"/>
+      <stop offset="70%" stop-color="#0284C7"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Símbolo: Sol Nascente com Prisma de Visão Futura -->
+  <g>
+    <!-- Disco Solar Central -->
+    <circle cx="70" cy="80" r="28" fill="url(#l2-sun)"/>
+
+    <!-- Feixe de Perspectiva / Olhar para o Futuro (45 graus) -->
+    <path d="M70 52C85.464 52 98 64.536 98 80L126 52L96 46C88 49 79 52 70 52Z" fill="url(#l2-beam)" fill-opacity="0.9"/>
+
+    <!-- Arco Ascendente Dinâmico -->
+    <path d="M38 98C42 66 70 42 102 44C114 45 124 50 130 56" stroke="url(#l2-orbit)" stroke-width="4.5" stroke-linecap="round"/>
+
+    <!-- Ponto de Luz no Horizonte Futuro -->
+    <circle cx="130" cy="56" r="4.5" fill="#F59E0B"/>
+    <circle cx="130" cy="56" r="8" stroke="#F59E0B" stroke-width="1.5" stroke-opacity="0.4"/>
+
+    <!-- Linha de Base Tecnológica -->
+    <path d="M38 106H104" stroke="#CBD5E1" stroke-width="3" stroke-linecap="round"/>
+    <path d="M112 106H122" stroke="#F59E0B" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <!-- Tipografia -->
+  <text x="146" y="80" font-family="system-ui, -apple-system, 'Inter', Roboto, sans-serif" font-size="35" font-weight="800" letter-spacing="0.08em" fill="#0F172A">
+    SINERGIA
+  </text>
+  <text x="148" y="104" font-family="system-ui, -apple-system, 'Inter', Roboto, sans-serif" font-size="10.5" font-weight="600" letter-spacing="0.28em" fill="#EA580C">
+    ENERGIA INTELIGENTE &amp; SOLAR
+  </text>
+</svg>
+

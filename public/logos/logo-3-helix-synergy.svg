@@ -1,0 +1,41 @@
+<svg width="400" height="150" viewBox="0 0 400 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradiente de Sustentabilidade & Renovável -->
+    <linearGradient id="l3-green" x1="30" y1="90" x2="90" y2="40" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#059669"/>
+      <stop offset="50%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#34D399"/>
+    </linearGradient>
+
+    <!-- Gradiente de Inovação & Tecnologia -->
+    <linearGradient id="l3-blue" x1="60" y1="110" x2="125" y2="45" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0284C7"/>
+      <stop offset="60%" stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#38BDF8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Símbolo: Infinito Sinérgico com Vetor Ascendente para a Frente -->
+  <g>
+    <!-- Laço 1: Base Renovável / Terra -->
+    <path d="M42 75C42 61.745 52.745 51 66 51C77.5 51 86 59 92 68L80 78C76 72 71 67 66 67C61.582 67 58 70.582 58 75C58 79.418 61.582 83 66 83C73 83 80 77 88 68C96 57 106 50 118 50C124 50 128 52 130 54" stroke="url(#l3-green)" stroke-width="7" stroke-linecap="round"/>
+
+    <!-- Laço 2: Fluxo Tecnológico que se Projeta para a Frente -->
+    <path d="M120 75C120 88.255 109.255 99 96 99C84.5 99 76 91 70 82L82 72C86 78 91 83 96 83C100.418 83 104 79.418 104 75C104 70.582 100.418 67 96 67C89 67 82 73 74 82C66 93 56 100 44 100" stroke="url(#l3-blue)" stroke-width="7" stroke-linecap="round"/>
+
+    <!-- Seta Vetorial no topo direito: "Olhar para frente" -->
+    <polygon points="124,42 138,52 122,58" fill="#10B981"/>
+    <circle cx="138" cy="52" r="2.5" fill="#34D399"/>
+  </g>
+
+  <!-- Tipografia -->
+  <text x="146" y="81" font-family="system-ui, -apple-system, 'Inter', Roboto, sans-serif" font-size="36" font-weight="800" letter-spacing="0.07em" fill="#0F172A">
+    SINERGIA
+  </text>
+  <text x="148" y="105" font-family="system-ui, -apple-system, 'Inter', Roboto, sans-serif" font-size="10.5" font-weight="600" letter-spacing="0.26em" fill="#059669">
+    TRANSIÇÃO ENERGÉTICA &amp; CLOUD
+  </text>
+  <rect x="148" y="114" width="38" height="2.5" rx="1.25" fill="#10B981"/>
+  <rect x="190" y="114" width="20" height="2.5" rx="1.25" fill="#0284C7"/>
+</svg>
+

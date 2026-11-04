@@ -1,0 +1,26 @@
+# Dependências
+/node_modules
+/.pnp
+.pnp.js
+
+# Build de produção
+/.next/
+/out/
+/build
+dist
+
+# Depuração e logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Variáveis locais
+.env*.local
+.env
+
+# Sistema operacional
+.DS_Store
+*.pem
+Thumbs.db
+
