@@ -101,3 +101,4 @@ export function SinergiaLogo({
     </svg>
   );
 }
+

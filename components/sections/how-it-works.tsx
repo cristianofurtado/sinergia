@@ -36,19 +36,19 @@ export function HowItWorks() {
   return (
     <section
       id="como-funciona"
-      className="py-20 bg-navy-900 border-b border-navy-800/80 relative"
+      className="py-20 bg-white border-b border-slate-200/80 relative"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-14">
         {/* Header */}
         <div className="max-w-3xl space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-navy-800 border border-navy-700 text-sky-400 text-xs font-bold uppercase tracking-wider">
-            <Zap className="w-3.5 h-3.5 text-solar-400" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold uppercase tracking-wider">
+            <Zap className="w-3.5 h-3.5 text-amber-500" />
             Transparência & Simplicidade
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight">
             Como funciona a economia Sinergia
           </h2>
-          <p className="text-slate-300 text-base sm:text-lg leading-relaxed">
+          <p className="text-slate-600 text-base sm:text-lg leading-relaxed">
             Sem instalar painéis solares no seu telhado, sem obras e sem reformas elétricas. Veja como é simples começar:
           </p>
         </div>
@@ -58,16 +58,16 @@ export function HowItWorks() {
           {steps.map((step) => (
             <div
               key={step.num}
-              className="rounded-2xl border border-navy-700/80 bg-navy-850/80 p-6 flex flex-col justify-between hover:border-solar-500/50 hover:bg-navy-800 transition-all group"
+              className="rounded-2xl border border-slate-200/90 bg-slate-50/70 p-6 flex flex-col justify-between hover:border-blue-400 hover:bg-white hover:shadow-card transition-all group"
             >
               <div className="space-y-4">
-                <span className="text-3xl sm:text-4xl font-black text-solar-400 font-mono tracking-wider block">
+                <span className="text-3xl sm:text-4xl font-black text-amber-500 font-mono tracking-wider block">
                   {step.num}
                 </span>
-                <h3 className="text-lg font-bold text-white group-hover:text-solar-300 transition-colors">
+                <h3 className="text-lg font-bold text-slate-900 group-hover:text-blue-900 transition-colors">
                   {step.title}
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
                   {step.desc}
                 </p>
               </div>
@@ -75,24 +75,24 @@ export function HowItWorks() {
           ))}
         </div>
 
-        {/* Informative Callout Card */}
-        <div className="rounded-3xl border border-navy-700 bg-gradient-to-r from-navy-850 via-navy-800 to-navy-850 p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+        {/* Informative Callout Card in Soft Blue */}
+        <div className="rounded-3xl border border-blue-200/90 bg-gradient-to-r from-blue-50/80 via-sky-50/60 to-blue-50/80 p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xs">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-solar-500/20 text-solar-400 border border-solar-500/30 flex items-center justify-center shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-sm">
               <Lightbulb className="w-6 h-6" />
             </div>
             <div className="space-y-1">
-              <h4 className="text-lg font-bold text-white">
+              <h4 className="text-lg font-bold text-slate-900">
                 Por que a adesão é 100% gratuita?
               </h4>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-2xl">
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-2xl">
                 As usinas solares parceiras da Sinergia injetam energia limpa na rede da distribuidora (conforme a Lei Federal nº 14.300/2022). Em troca, a concessionária gera créditos de compensação que são aplicados na sua fatura com desconto garantido.
               </p>
             </div>
           </div>
 
           <a href="#contato" className="shrink-0 w-full md:w-auto">
-            <Button variant="solar" size="md" className="w-full md:w-auto font-bold text-navy-950">
+            <Button variant="solar" size="md" className="w-full md:w-auto font-bold text-slate-950 shadow-sm">
               Tirar dúvidas no WhatsApp
               <ArrowRight className="w-4 h-4 ml-1.5" />
             </Button>

@@ -26,7 +26,7 @@ export function Ecosystem() {
       category: "Venda B2C",
       icon: Zap,
       highlight: true,
-      desc: "Assinatura de energia limpa para residências e comércios. Cliente ganha até 26% de desconto na conta e você recebe comissões mensais recorrentes.",
+      desc: "Assinatura de energia limpa para residências e comércios. O cliente ganha até 26% de desconto na fatura e você recebe comissões mensais recorrentes.",
     },
     {
       id: "Mercado Livre B2B",
@@ -84,22 +84,22 @@ export function Ecosystem() {
   const currentModuleData = modules.find((m) => m.id === selectedModule) || modules[0];
 
   return (
-    <section id="estrutura" className="py-20 bg-navy-950 border-b border-navy-800/80">
+    <section id="estrutura" className="py-20 bg-slate-50 border-b border-slate-200/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           {/* Left Column: Headline and Bullets */}
           <div className="lg:col-span-6 space-y-6">
             <div className="space-y-3">
-              <span className="text-xs font-bold tracking-widest uppercase text-solar-400 bg-solar-500/10 px-3 py-1 rounded-full border border-solar-500/30">
+              <span className="text-xs font-bold tracking-widest uppercase text-blue-700 bg-blue-100/70 px-3 py-1 rounded-full border border-blue-200">
                 VENDA DE ENERGIA • GESTÃO & COMISSÕES
               </span>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
                 Venda de Energia. <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-solar-400 to-solar-orange">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-amber-600">
                   Sua gestão. Tudo em um só lugar.
                 </span>
               </h2>
-              <p className="text-base sm:text-lg text-slate-300 leading-relaxed pt-2 font-normal">
+              <p className="text-base sm:text-lg text-slate-600 leading-relaxed pt-2 font-normal">
                 Uma estrutura digital completa criada para que Corretores, Consultores e Líderes possam vender energia solar por assinatura e Mercado Livre, acompanhar contratos e faturar comissões mensais recorrentes.
               </p>
             </div>
@@ -117,20 +117,20 @@ export function Ecosystem() {
                     }}
                     className={`flex items-center gap-2.5 text-left text-sm font-semibold p-3 rounded-xl transition-all ${
                       mod.highlight
-                        ? "text-solar-300 bg-solar-500/15 border border-solar-500/50 shadow-sm"
+                        ? "text-amber-900 bg-amber-50/90 border border-amber-300 shadow-xs"
                         : isSelected
-                        ? "text-white bg-navy-800 border border-navy-600 shadow-sm"
-                        : "text-slate-300 hover:text-white hover:bg-navy-850 border border-navy-800"
+                        ? "text-blue-950 bg-white border border-blue-400 shadow-xs"
+                        : "text-slate-700 hover:text-slate-900 hover:bg-white border border-slate-200/80"
                     }`}
                   >
                     <span
                       className={`w-2.5 h-2.5 rounded-full shrink-0 ${
-                        mod.highlight ? "bg-solar-400 ring-4 ring-solar-500/20" : "bg-sky-400"
+                        mod.highlight ? "bg-amber-500 ring-4 ring-amber-200" : "bg-blue-600"
                       }`}
                     />
                     <span>{mod.title}</span>
                     {mod.highlight && (
-                      <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-solar-500 text-navy-950 ml-auto">
+                      <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 ml-auto">
                         Destaque
                       </span>
                     )}
@@ -142,13 +142,13 @@ export function Ecosystem() {
             {/* CTA Button */}
             <div className="pt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <a href="#contato">
-                <Button variant="solar" size="lg" className="w-full sm:w-auto font-black text-navy-950 shadow-glow">
+                <Button variant="solar" size="lg" className="w-full sm:w-auto font-black text-slate-950 shadow-sm hover:shadow">
                   Quero Vender Energia Sinergia
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </a>
               <a href="#simulador">
-                <Button variant="outline" size="lg" className="w-full sm:w-auto border-navy-700 bg-navy-900/80 text-slate-200">
+                <Button variant="outline" size="lg" className="w-full sm:w-auto border-slate-300 bg-white text-slate-700 hover:bg-slate-50">
                   Ver Simulador de Fatura
                 </Button>
               </a>
@@ -157,9 +157,9 @@ export function Ecosystem() {
 
           {/* Right Column: Interactive Grid */}
           <div className="lg:col-span-6">
-            <div className="bg-navy-900 rounded-3xl border border-navy-700 p-6 sm:p-8 shadow-elevation space-y-6">
+            <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-card space-y-6">
               {/* Modules Matrix Grid (2 Columns) */}
-              <div className="grid grid-cols-2 gap-px bg-navy-800 rounded-2xl overflow-hidden border border-navy-700">
+              <div className="grid grid-cols-2 gap-px bg-slate-200 rounded-2xl overflow-hidden border border-slate-200">
                 {modules.map((mod) => {
                   const Icon = mod.icon;
                   const isSelected = selectedModule === mod.id;
@@ -173,28 +173,28 @@ export function Ecosystem() {
                         setSelectedModule(mod.id);
                         setActiveCategory(mod.category);
                       }}
-                      className={`p-4 sm:p-5 flex items-center justify-between transition-all text-left bg-navy-850 hover:bg-navy-800 ${
+                      className={`p-4 sm:p-5 flex items-center justify-between transition-all text-left bg-white hover:bg-slate-50 ${
                         isSelected
-                          ? "bg-navy-800 ring-2 ring-inset ring-solar-500 font-bold text-white"
+                          ? "bg-blue-50/80 ring-2 ring-inset ring-blue-600 font-bold text-blue-950"
                           : matchesFilter
-                          ? "text-slate-200"
-                          : "text-slate-500 opacity-60"
+                          ? "text-slate-800"
+                          : "text-slate-400 opacity-60"
                       }`}
                     >
                       <div className="flex items-center gap-3">
                         <Icon
                           className={`w-5 h-5 ${
                             mod.highlight
-                              ? "text-solar-400"
+                              ? "text-amber-500"
                               : isSelected
-                              ? "text-sky-400"
+                              ? "text-blue-600"
                               : "text-slate-400"
                           }`}
                         />
                         <span className="text-sm font-semibold">{mod.title}</span>
                       </div>
                       {mod.highlight && (
-                        <div className="w-2 h-2 rounded-full bg-solar-400 animate-pulse" />
+                        <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
                       )}
                     </button>
                   );
@@ -202,26 +202,26 @@ export function Ecosystem() {
               </div>
 
               {/* Dynamic details card for selected module */}
-              <div className="bg-navy-950 rounded-2xl p-4 sm:p-5 border border-navy-800 space-y-2">
+              <div className="bg-slate-50 rounded-2xl p-4 sm:p-5 border border-slate-200/80 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
                     Solução de Venda de Energia
                   </span>
-                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-navy-800 text-solar-300 font-semibold border border-navy-700">
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 font-semibold border border-blue-200">
                     {currentModuleData.category}
                   </span>
                 </div>
-                <h4 className="text-base font-bold text-white flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-solar-400" />
+                <h4 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                   {currentModuleData.title}
                 </h4>
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
                   {currentModuleData.desc}
                 </p>
               </div>
 
               {/* Category Pills */}
-              <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-navy-800">
+              <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
                 {categories.map((cat) => (
                   <button
                     key={cat}
@@ -232,8 +232,8 @@ export function Ecosystem() {
                     }}
                     className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
                       activeCategory === cat
-                        ? "bg-solar-500 text-navy-950 shadow-sm"
-                        : "bg-navy-800 text-slate-300 hover:bg-navy-700 hover:text-white border border-navy-700"
+                        ? "bg-blue-900 text-white shadow-xs"
+                        : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900"
                     }`}
                   >
                     {cat}

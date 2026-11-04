@@ -4,8 +4,8 @@
 
 @layer base {
   :root {
-    --background: #070f1e;
-    --foreground: #f8fafc;
+    --background: #f8fafc;
+    --foreground: #0f172a;
   }
 
   html {
@@ -22,7 +22,7 @@
   }
 
   ::selection {
-    background-color: #f59e0b;
-    color: #040914;
+    background-color: #fed7aa;
+    color: #9a3412;
   }
 }

@@ -7,32 +7,31 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "SÍNERGIA | Economia de Energia, Mercado Livre & Ecossistema de Gestão",
+  title: "Sinergia | Venda de Energia, Mercado Livre & Economia na Fatura",
   description:
-    "Economize de 10% a 30% na sua fatura de energia sem obras ou investimentos. Estrutura digital completa para clientes B2B, B2C, Corretores e Líderes.",
+    "Economize de 10% a 30% na conta de luz sem obras ou investimentos. Estrutura digital completa de Venda de Energia para clientes B2B, B2C, Corretores e Líderes.",
   keywords: [
     "Sinergia",
+    "Venda de Energia",
     "Economia de Energia",
     "Geração Distribuída",
     "Mercado Livre de Energia",
-    "Energia Solar",
-    "Redução de Conta de Luz",
-    "Venda Energia",
+    "Energia Solar por Assinatura",
+    "Desconto na Conta de Luz",
     "Corretores de Energia",
-    "Gestão B2B e B2C",
   ],
   authors: [{ name: "Sinergia" }],
   icons: {
-    icon: "/sinergia-logo-vector.svg",
+    icon: "/logo-oficial.png",
   },
   robots: "index, follow",
   openGraph: {
     type: "website",
     locale: "pt_BR",
     url: "https://sinergia.tech",
-    title: "SÍNERGIA | Economia de Energia & Oportunidade de Negócio",
+    title: "Sinergia | Venda de Energia & Economia na Fatura",
     description:
-      "Economize de 10% a 30% na fatura de energia. Sem obras, sem custo de adesão e 100% digital.",
+      "Economize de 10% a 30% na fatura de energia sem obras e 100% digital.",
     siteName: "Sinergia",
   },
 };
@@ -43,8 +42,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className="scroll-smooth dark">
-      <body className="min-h-screen bg-navy-900 text-slate-100 font-sans antialiased selection:bg-solar-500 selection:text-navy-950">
+    <html lang="pt-BR" className="scroll-smooth">
+      <body className="min-h-screen bg-slate-50 text-slate-900 font-sans antialiased selection:bg-amber-100 selection:text-amber-900">
         {children}
       </body>
     </html>
