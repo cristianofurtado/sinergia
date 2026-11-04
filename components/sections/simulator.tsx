@@ -294,9 +294,10 @@ export function Simulator() {
         {/* ------------------------------------------------------------- */}
         {/* OFFICIAL DISCOUNT TABLE (EXACT FIDELITY FROM ATTACHED IMAGE) */}
         {/* ------------------------------------------------------------- */}
+        <div id="cobertura" className="scroll-mt-24" />
         <div
           id="tabela-descontos"
-          className="rounded-3xl border border-blue-200 bg-white p-6 sm:p-10 shadow-card space-y-8"
+          className="rounded-3xl border border-blue-200 bg-white p-5 sm:p-10 shadow-card space-y-6 sm:space-y-8 scroll-mt-24"
         >
           {/* Header of the Official Table */}
           <div className="text-center space-y-3 max-w-3xl mx-auto">

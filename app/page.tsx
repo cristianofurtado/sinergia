@@ -4,7 +4,6 @@ import { Footer } from "@/components/layout/footer";
 import { Hero } from "@/components/sections/hero";
 import { HowItWorks } from "@/components/sections/how-it-works";
 import { Simulator } from "@/components/sections/simulator";
-import { Coverage } from "@/components/sections/coverage";
 import { Ecosystem } from "@/components/sections/ecosystem";
 import { Contact } from "@/components/sections/contact";
 
@@ -16,7 +15,6 @@ export default function Home() {
         <Hero />
         <HowItWorks />
         <Simulator />
-        <Coverage />
         <Ecosystem />
         <Contact />
       </main>

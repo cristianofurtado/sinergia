@@ -52,7 +52,7 @@ export function Header() {
     { label: "Início", href: "#inicio" },
     { label: "Venda Energia", href: "#venda-energia" },
     { label: "Como Funciona", href: "#como-funciona" },
-    { label: "Simulador Oficial", href: "#simulador" },
+    { label: "Simulador", href: "#simulador" },
     { label: "Tabela de Descontos", href: "#tabela-descontos" },
     { label: "Contato", href: "#contato" },
   ];
@@ -60,16 +60,16 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-blue-100/80 bg-white/95 backdrop-blur-md transition-all shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-18 sm:h-20">
+        <div className="flex items-center justify-between h-16 sm:h-18 lg:h-20">
           {/* Logo Oficial */}
           <Link href="#inicio" className="flex items-center shrink-0">
             <Image
               src="/logo-oficial.png"
               alt="Sinergia"
-              width={150}
-              height={40}
+              width={140}
+              height={36}
               priority
-              className="h-8 sm:h-9 w-auto object-contain transition-opacity hover:opacity-90"
+              className="h-7 sm:h-8 lg:h-9 w-auto object-contain transition-opacity hover:opacity-90"
             />
           </Link>
 
@@ -102,8 +102,12 @@ export function Header() {
 
           {/* Mobile Right Controls: Fast Simulator Button + Hamburger Toggle */}
           <div className="lg:hidden flex items-center gap-2">
-            <a href="#simulador" className="sm:inline-flex hidden">
-              <Button variant="solar" size="sm" className="font-bold text-slate-950 text-xs px-3">
+            <a href="#simulador" className="inline-flex">
+              <Button
+                variant="solar"
+                size="sm"
+                className="font-bold text-slate-950 text-xs px-2.5 py-1.5 h-9"
+              >
                 <Zap className="w-3.5 h-3.5 fill-slate-950" />
                 Simular
               </Button>
@@ -112,10 +116,10 @@ export function Header() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(true)}
-              className="p-2.5 rounded-xl text-slate-800 bg-blue-50 border border-blue-200 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-600 active:scale-95 transition-all"
+              className="p-2 rounded-xl text-slate-800 bg-blue-50/80 border border-blue-200 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-600 active:scale-95 transition-all h-9 w-9 flex items-center justify-center"
               aria-label="Abrir menu"
             >
-              <Menu className="w-6 h-6 text-slate-900" />
+              <Menu className="w-5 h-5 text-slate-900" />
             </button>
           </div>
         </div>
@@ -128,7 +132,7 @@ export function Header() {
           style={{ overscrollBehavior: "none" }}
         >
           {/* Top Bar inside Fullscreen Menu */}
-          <div className="flex items-center justify-between px-5 h-18 border-b border-blue-100 bg-white shrink-0">
+          <div className="flex items-center justify-between px-4 sm:px-6 h-16 border-b border-blue-100 bg-white shrink-0">
             <Link
               href="#inicio"
               onClick={() => setMobileMenuOpen(false)}
@@ -137,40 +141,40 @@ export function Header() {
               <Image
                 src="/logo-oficial.png"
                 alt="Sinergia"
-                width={140}
-                height={38}
+                width={130}
+                height={34}
                 priority
-                className="h-8 w-auto object-contain"
+                className="h-7 w-auto object-contain"
               />
             </Link>
 
             <button
               type="button"
               onClick={() => setMobileMenuOpen(false)}
-              className="p-2.5 rounded-xl bg-slate-100 text-slate-800 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-600 active:scale-95 transition-all"
+              className="p-2 rounded-xl bg-slate-100 text-slate-800 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-600 active:scale-95 transition-all h-9 w-9 flex items-center justify-center"
               aria-label="Fechar menu"
             >
-              <X className="w-6 h-6 text-slate-900" />
+              <X className="w-5 h-5 text-slate-900" />
             </button>
           </div>
 
-          {/* Navigation Links List (Evenly spaced, large touchable rows) */}
-          <div className="flex-1 px-6 py-6 flex flex-col justify-center space-y-2">
+          {/* Navigation Links List (Evenly spaced, large touchable rows, scrollable if screen is very small) */}
+          <div className="flex-1 px-5 py-4 overflow-y-auto flex flex-col justify-center space-y-1.5">
             {navLinks.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-between py-3.5 px-3 rounded-xl text-lg font-extrabold text-slate-800 hover:text-blue-700 hover:bg-blue-50/70 active:bg-blue-100/80 transition-colors"
+                className="flex items-center justify-between py-3 px-3.5 rounded-xl text-base font-bold text-slate-800 hover:text-blue-700 hover:bg-blue-50/70 active:bg-blue-100/80 transition-colors"
               >
                 <span>{link.label}</span>
-                <ChevronRight className="w-5 h-5 text-blue-600" />
+                <ChevronRight className="w-4 h-4 text-amber-500" />
               </a>
             ))}
           </div>
 
           {/* Bottom Actions inside Fullscreen Menu */}
-          <div className="p-5 border-t border-blue-100 bg-slate-50/80 space-y-3 shrink-0">
+          <div className="p-4 sm:p-5 border-t border-blue-100 bg-slate-50/90 space-y-2.5 shrink-0">
             <a
               href="#simulador"
               onClick={() => setMobileMenuOpen(false)}
@@ -179,7 +183,7 @@ export function Header() {
               <Button
                 variant="solar"
                 size="lg"
-                className="w-full text-slate-950 font-black shadow-md py-4 text-sm"
+                className="w-full text-slate-950 font-black shadow-sm py-3 text-sm h-11"
               >
                 <Zap className="w-4 h-4 fill-slate-950 mr-1.5" />
                 SIMULAR ECONOMIA NA CONTA
@@ -192,18 +196,18 @@ export function Header() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-center gap-1.5 py-3 font-bold text-emerald-700 bg-emerald-50 rounded-xl border border-emerald-200 active:bg-emerald-100"
+                className="flex items-center justify-center gap-1.5 py-2.5 font-bold text-emerald-700 bg-emerald-50 rounded-xl border border-emerald-200 active:bg-emerald-100 h-10"
               >
-                <MessageSquare className="w-4 h-4" />
+                <MessageSquare className="w-3.5 h-3.5" />
                 WhatsApp
               </a>
 
               <a
                 href="tel:+5571987822230"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-center gap-1.5 py-3 font-bold text-blue-700 bg-blue-50 rounded-xl border border-blue-200 active:bg-blue-100"
+                className="flex items-center justify-center gap-1.5 py-2.5 font-bold text-blue-700 bg-blue-50 rounded-xl border border-blue-200 active:bg-blue-100 h-10"
               >
-                <Phone className="w-4 h-4" />
+                <Phone className="w-3.5 h-3.5" />
                 Ligar Agora
               </a>
             </div>
