@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import {
   FileText,
   TrendingUp,
@@ -12,7 +13,6 @@ import {
   Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SinergiaLogo } from "@/components/ui/sinergia-logo";
 
 export function Hero() {
   const [faturaValue, setFaturaValue] = useState<number>(690);
@@ -129,9 +129,16 @@ export function Hero() {
                   {/* Dynamic Island / Speaker Notch */}
                   <div className="w-24 h-4 bg-slate-900 rounded-full mx-auto mb-4" />
 
-                  {/* App Header: Logo SÍNERGIA (com o símbolo e IA laranja da foto) + Document Icon */}
+                  {/* App Header: Logo Oficial SINERGIA da foto + Document Icon */}
                   <div className="flex items-center justify-between pb-3">
-                    <SinergiaLogo variant="dark" height={22} />
+                    <Image
+                      src="/sinergia-hero-logo-clean.png"
+                      alt="Sinergia"
+                      width={140}
+                      height={35}
+                      className="h-8 w-auto object-contain"
+                      priority
+                    />
                     <div className="p-1 rounded-md text-slate-500 hover:text-slate-800">
                       <FileText className="w-5 h-5 text-slate-600" />
                     </div>
