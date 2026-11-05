@@ -74,7 +74,7 @@ export function Simulator() {
               <span className="text-amber-500">NOVOS CLIENTES</span>
             </h3>
             <p className="text-xs sm:text-sm text-slate-600">
-              Descontos garantidos na conta de energia por distribuidora credenciada.
+              A energia que o sistema gera e não usa vira crédito, e esse crédito volta como desconto na sua conta de luz.
             </p>
           </div>
 
@@ -128,13 +128,10 @@ export function Simulator() {
           </div>
 
           {/* Broker Disclaimer */}
-          <div className="p-4 rounded-xl bg-[#eaf2f5] border border-[#284b63]/20 text-center max-w-3xl mx-auto space-y-1">
+          <div className="p-4 rounded-xl bg-[#eaf2f5] border border-[#284b63]/20 text-center max-w-3xl mx-auto">
             <p className="text-xs sm:text-sm text-slate-800 font-medium leading-relaxed">
               A <strong>SINERGIA</strong> é uma corretora que conecta clientes e geradoras,
               conseguindo sempre o melhor desconto para você.
-            </p>
-            <p className="text-[11px] text-slate-500 italic">
-              Os descontos apresentados nesta tabela são mínimos e podem ser maiores.
             </p>
           </div>
 
@@ -151,7 +148,7 @@ export function Simulator() {
                 size="lg"
                 className="w-full sm:w-auto font-black text-slate-950 text-sm sm:text-base py-3.5 px-7 shadow-md"
               >
-                QUERO GARANTIR ESTE DESCONTO AGORA
+                QUERO MEU DESCONTO AGORA
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </a>

@@ -9,7 +9,7 @@ export function HowItWorks() {
     {
       num: "01",
       title: "Envio da fatura",
-      desc: "Foto da sua conta recente pelo WhatsApp.",
+      desc: "Envio da fatura PDF ou foto total da fatura legível pelo WhatsApp.",
     },
     {
       num: "02",
@@ -46,7 +46,7 @@ export function HowItWorks() {
             PASSO A PASSO
           </div>
           <h2 className="text-xl sm:text-3xl font-extrabold text-[#0e526c] tracking-tight">
-            Como funciona a economia Sinergia
+            Como funciona adesão para economizar na conta de luz
           </h2>
           <p className="text-slate-600 text-xs sm:text-sm">
             Sem placas no telhado e sem obras. Rápido, digital e transparente:

@@ -22,7 +22,7 @@ export function Footer() {
               />
             </Link>
             <p className="text-xs sm:text-sm text-sky-100/80 leading-relaxed max-w-sm">
-              Plataforma de Venda de Energia e ecossistema de gestão para clientes B2B, B2C e consultores em todo o Brasil.
+              Plataforma de gestão de Energia e ecossistema para clientes B2B e consultores em todo o Brasil.
             </p>
             <div className="flex items-center gap-2 text-xs font-semibold text-emerald-400 pt-0.5">
               <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -42,8 +42,8 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <a href="#venda-energia" className="text-slate-300 hover:text-white transition-colors">
-                  Venda Energia
+                <a href="#assine-energia" className="text-slate-300 hover:text-white transition-colors">
+                  Assine sua Energia
                 </a>
               </li>
               <li>

@@ -19,19 +19,21 @@ export function Ecosystem() {
   const [activeTab, setActiveTab] = useState<"gd" | "acl" | "parceiros">("gd");
 
   return (
-    <section id="venda-energia" className="py-14 sm:py-20 bg-[#ffffff] border-b border-slate-200">
+    <section id="assine-energia" className="py-14 sm:py-20 bg-[#ffffff] border-b border-slate-200">
+      {/* Anchor for backward compatibility with #venda-energia and #estrutura */}
+      <div id="venda-energia" className="scroll-mt-24" />
       <div id="estrutura" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-10">
         {/* Section Header */}
         <div className="max-w-3xl space-y-2">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#eaf2f5] border border-[#284b63]/20 text-[#0e526c] text-[11px] sm:text-xs font-bold uppercase tracking-wider">
             <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-            MODALIDADES DE ENERGIA
+            GESTÃO INTELIGENTE DE ENERGIA
           </div>
           <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0e526c] tracking-tight">
-            Venda de Energia Sinergia
+            Assine sua energia
           </h2>
           <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
-            Economia garantida na conta de luz para consumidores e receita mensal recorrente para corretores.
+            Plataforma de gestão de Energia e ecossistema para clientes B2B e consultores em todo o Brasil.
           </p>
         </div>
 
@@ -97,7 +99,7 @@ export function Ecosystem() {
                 <div className="flex items-start gap-2.5 p-3 rounded-xl bg-[#f0f5f8] border border-slate-200">
                   <Percent className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
                   <div>
-                    <h4 className="text-xs sm:text-sm font-bold text-slate-900">Desconto garantido todo mês</h4>
+                    <h4 className="text-xs sm:text-sm font-bold text-slate-900">Créditos de energia todo mês</h4>
                     <p className="text-[11px] text-slate-600">Economia real aplicada diretamente sobre o consumo de energia.</p>
                   </div>
                 </div>
@@ -280,10 +282,10 @@ export function Ecosystem() {
                   Para Corretores & Consultores
                 </span>
                 <h3 className="text-xl sm:text-2xl font-extrabold text-[#0e526c] leading-snug">
-                  Venda Energia e construa receita recorrente mensal
+                  Seja consultor de energia por assinatura e construa receita recorrente
                 </h3>
                 <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
-                  Todo mundo paga conta de luz. Oferecer desconto sem obras e sem taxa de adesão é a venda mais rápida do mercado. Receba comissões todo mês enquanto o cliente economizar.
+                  Todo mundo paga conta de luz. Oferecer economia sem obras e sem taxa de adesão é a recomendação mais procurada do mercado. Receba comissões todo mês enquanto o cliente economizar.
                 </p>
               </div>
 

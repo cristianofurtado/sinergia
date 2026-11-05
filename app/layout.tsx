@@ -7,18 +7,19 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Sinergia | Venda de Energia, Mercado Livre & Economia na Fatura",
+  title: "Sinergia | Assine sua Energia, Mercado Livre & Gestão Inteligente",
   description:
-    "Economize de 10% a 30% na conta de luz sem obras ou investimentos. Estrutura digital completa de Venda de Energia para clientes B2B, B2C, Corretores e Líderes.",
+    "Plataforma de gestão de Energia e ecossistema para clientes B2B e consultores em todo o Brasil. Economize de 10% a 30% na conta de luz sem obras ou investimentos.",
   keywords: [
     "Sinergia",
-    "Venda de Energia",
-    "Economia de Energia",
+    "Assine sua Energia",
+    "Economia na Conta de Luz",
+    "Receba Créditos de Energia Solar",
     "Geração Distribuída",
     "Mercado Livre de Energia",
     "Energia Solar por Assinatura",
     "Desconto na Conta de Luz",
-    "Corretores de Energia",
+    "Consultores de Energia",
   ],
   authors: [{ name: "Sinergia" }],
   icons: {
@@ -29,9 +30,9 @@ export const metadata: Metadata = {
     type: "website",
     locale: "pt_BR",
     url: "https://sinergia.tech",
-    title: "Sinergia | Venda de Energia & Economia na Fatura",
+    title: "Sinergia | Assinatura de Energia & Economia na Conta de Luz",
     description:
-      "Economize de 10% a 30% na fatura de energia sem obras e 100% digital.",
+      "Plataforma de gestão de Energia e ecossistema para clientes B2B e consultores em todo o Brasil.",
     siteName: "Sinergia",
   },
 };

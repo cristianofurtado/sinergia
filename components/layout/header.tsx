@@ -50,7 +50,7 @@ export function Header() {
 
   const navLinks = [
     { label: "Início", href: "#inicio" },
-    { label: "Venda Energia", href: "#venda-energia" },
+    { label: "Assine sua Energia", href: "#assine-energia" },
     { label: "Como Funciona", href: "#como-funciona" },
     { label: "Tabela de Descontos", href: "#tabela-descontos" },
     { label: "Contato", href: "#contato" },
