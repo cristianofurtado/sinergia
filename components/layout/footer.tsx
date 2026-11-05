@@ -42,11 +42,6 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <a href="#assine-energia" className="text-slate-300 hover:text-white transition-colors">
-                  Assine sua Energia
-                </a>
-              </li>
-              <li>
                 <a href="#como-funciona" className="text-slate-300 hover:text-white transition-colors">
                   Como Funciona
                 </a>
@@ -54,6 +49,11 @@ export function Footer() {
               <li>
                 <a href="#tabela-descontos" className="text-slate-300 hover:text-white transition-colors">
                   Tabela de Descontos
+                </a>
+              </li>
+              <li>
+                <a href="#assine-energia" className="text-slate-300 hover:text-white transition-colors">
+                  Assine sua Energia
                 </a>
               </li>
               <li>
