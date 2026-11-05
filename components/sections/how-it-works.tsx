@@ -86,13 +86,13 @@ export function HowItWorks() {
             </p>
           </div>
 
-          <a href="#simulador" className="shrink-0 w-full sm:w-auto">
+          <a href="#tabela-descontos" className="shrink-0 w-full sm:w-auto">
             <Button
               variant="solar"
               size="sm"
               className="w-full sm:w-auto font-bold text-slate-950 text-xs px-3.5 py-1.5 h-8 shadow-2xs"
             >
-              Simular Meu Desconto
+              Ver Tabela de Descontos
               <ArrowRight className="w-3.5 h-3.5 ml-1" />
             </Button>
           </a>

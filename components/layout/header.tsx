@@ -52,7 +52,6 @@ export function Header() {
     { label: "Início", href: "#inicio" },
     { label: "Venda Energia", href: "#venda-energia" },
     { label: "Como Funciona", href: "#como-funciona" },
-    { label: "Simulador", href: "#simulador" },
     { label: "Tabela de Descontos", href: "#tabela-descontos" },
     { label: "Contato", href: "#contato" },
   ];
@@ -88,28 +87,28 @@ export function Header() {
 
           {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-3">
-            <a href="#simulador">
+            <a href="#tabela-descontos">
               <Button
                 variant="solar"
                 size="md"
                 className="font-bold text-slate-950 shadow-xs hover:shadow"
               >
                 <Zap className="w-4 h-4 fill-slate-950" />
-                Simular Economia
+                Ver Descontos
               </Button>
             </a>
           </div>
 
-          {/* Mobile Right Controls: Fast Simulator Button + Hamburger Toggle */}
+          {/* Mobile Right Controls: Fast Discount Button + Hamburger Toggle */}
           <div className="lg:hidden flex items-center gap-2">
-            <a href="#simulador" className="inline-flex">
+            <a href="#tabela-descontos" className="inline-flex">
               <Button
                 variant="solar"
                 size="sm"
                 className="font-bold text-slate-950 text-xs px-2.5 py-1.5 h-9"
               >
                 <Zap className="w-3.5 h-3.5 fill-slate-950" />
-                Simular
+                Descontos
               </Button>
             </a>
 
@@ -176,7 +175,7 @@ export function Header() {
           {/* Bottom Actions inside Fullscreen Menu */}
           <div className="p-4 sm:p-5 border-t border-blue-100 bg-slate-50/90 space-y-2.5 shrink-0">
             <a
-              href="#simulador"
+              href="#tabela-descontos"
               onClick={() => setMobileMenuOpen(false)}
               className="block"
             >
@@ -186,7 +185,7 @@ export function Header() {
                 className="w-full text-slate-950 font-black shadow-sm py-3 text-sm h-11"
               >
                 <Zap className="w-4 h-4 fill-slate-950 mr-1.5" />
-                SIMULAR ECONOMIA NA CONTA
+                VER TABELA DE DESCONTOS
               </Button>
             </a>
 

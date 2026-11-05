@@ -120,9 +120,9 @@ export function Ecosystem() {
               </div>
 
               <div className="pt-1">
-                <a href="#simulador" className="block sm:inline-block">
+                <a href="#tabela-descontos" className="block sm:inline-block">
                   <Button variant="solar" size="md" className="w-full sm:w-auto font-bold text-slate-950 py-3 text-xs sm:text-sm shadow-xs">
-                    Simular Economia na Fatura
+                    Ver Tabela de Descontos
                     <ArrowRight className="w-4 h-4 ml-1.5" />
                   </Button>
                 </a>

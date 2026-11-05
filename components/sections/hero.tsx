@@ -69,9 +69,9 @@ export function Hero() {
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-1">
-              <a href="#simulador" className="w-full sm:w-auto">
+              <a href="#tabela-descontos" className="w-full sm:w-auto">
                 <Button variant="solar" size="lg" className="w-full sm:w-auto shadow-md font-bold text-slate-950 py-3.5 px-7">
-                  Simular Minha Economia
+                  Ver Tabela de Descontos
                   <ArrowRight className="w-4 h-4 ml-1.5" />
                 </Button>
               </a>
@@ -200,7 +200,7 @@ export function Hero() {
 
                   {/* Button */}
                   <a
-                    href="#simulador"
+                    href="#tabela-descontos"
                     className="block text-center rounded-xl bg-amber-500 text-slate-950 font-black text-[10px] sm:text-xs uppercase tracking-wider py-2 sm:py-2.5 shadow-xs hover:bg-amber-400 active:scale-98 transition-all"
                   >
                     VER DETALHES

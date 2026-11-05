@@ -52,11 +52,6 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <a href="#simulador" className="text-slate-300 hover:text-white transition-colors">
-                  Simulador de Economia
-                </a>
-              </li>
-              <li>
                 <a href="#tabela-descontos" className="text-slate-300 hover:text-white transition-colors">
                   Tabela de Descontos
                 </a>
