@@ -34,7 +34,7 @@ export function Simulator() {
     { name: "CPFL PIRATININGA", rate: "15%", uf: "SP", region: "sudeste", id: "cpfl-piratininga" },
     { name: "EDP ES", rate: "15%", uf: "ES", region: "sudeste", id: "edp-es" },
     { name: "ENEL RJ", rate: "15%", uf: "RJ", region: "sudeste", id: "enel-rj" },
-    { name: "LIGHT RJ", rate: "15%", uf: "RJ", region: "sudeste", id: "light-rj" },
+    { name: "LIGHT RJ", rate: "12%", uf: "RJ", region: "sudeste", id: "light-rj" },
     { name: "ENERGISA SUL SUDESTE", rate: "15%", uf: "SP/PR", region: "sudeste", id: "energisa-sul-sudeste" },
 
     // Nordeste (7)
@@ -100,7 +100,7 @@ export function Simulator() {
             <div className="flex justify-center">
               <Image
                 src="/logo-oficial.png"
-                alt="Sinergia"
+                alt="Energia Prospectar"
                 width={140}
                 height={36}
                 className="h-7 sm:h-8 w-auto object-contain"
@@ -210,7 +210,7 @@ export function Simulator() {
           {/* Broker Disclaimer */}
           <div className="p-3 sm:p-3.5 rounded-xl bg-[#eaf2f5] border border-[#284b63]/20 text-center max-w-2xl mx-auto">
             <p className="text-xs text-slate-800 font-medium leading-relaxed">
-              A <strong>SINERGIA</strong> é uma corretora que conecta clientes e geradoras,
+              A <strong>ENERGIA PROSPECTAR</strong> é uma corretora que conecta clientes e geradoras,
               conseguindo sempre o melhor desconto para você.
             </p>
           </div>

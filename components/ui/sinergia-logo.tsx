@@ -27,7 +27,7 @@ export function SinergiaLogo({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={`select-none ${className}`}
-      aria-label="Sinergia Logo"
+      aria-label="Energia Prospectar Logo"
     >
       {/* SÍNERG in bold modern sans */}
       <text

@@ -64,7 +64,7 @@ export function Header() {
           <Link href="#inicio" className="flex items-center shrink-0">
             <Image
               src="/logo-oficial.png"
-              alt="Sinergia"
+              alt="Energia Prospectar"
               width={140}
               height={36}
               priority
@@ -139,7 +139,7 @@ export function Header() {
             >
               <Image
                 src="/logo-oficial.png"
-                alt="Sinergia"
+                alt="Energia Prospectar"
                 width={130}
                 height={34}
                 priority

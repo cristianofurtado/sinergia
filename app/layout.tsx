@@ -7,11 +7,11 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Sinergia | Assine sua Energia, Mercado Livre & Gestão Inteligente",
+  title: "Energia Prospectar | Assine sua Energia, Mercado Livre & Gestão Inteligente",
   description:
     "Plataforma de gestão de Energia e ecossistema para clientes B2B e consultores em todo o Brasil. Economize de 10% a 30% na conta de luz sem obras ou investimentos.",
   keywords: [
-    "Sinergia",
+    "Energia Prospectar",
     "Assine sua Energia",
     "Economia na Conta de Luz",
     "Receba Créditos de Energia Solar",
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     "Desconto na Conta de Luz",
     "Consultores de Energia",
   ],
-  authors: [{ name: "Sinergia" }],
+  authors: [{ name: "Energia Prospectar" }],
   icons: {
     icon: "/logo-oficial.png",
   },
@@ -30,10 +30,10 @@ export const metadata: Metadata = {
     type: "website",
     locale: "pt_BR",
     url: "https://sinergia.tech",
-    title: "Sinergia | Assinatura de Energia & Economia na Conta de Luz",
+    title: "Energia Prospectar | Assinatura de Energia & Economia na Conta de Luz",
     description:
       "Plataforma de gestão de Energia e ecossistema para clientes B2B e consultores em todo o Brasil.",
-    siteName: "Sinergia",
+    siteName: "Energia Prospectar",
   },
 };
 

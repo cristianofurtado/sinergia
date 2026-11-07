@@ -318,7 +318,7 @@ export function Ecosystem() {
               <div className="pt-1">
                 <a href="#contato" className="block sm:inline-block">
                   <Button variant="solar" size="md" className="w-full sm:w-auto font-bold text-slate-950 py-3 text-xs sm:text-sm shadow-xs">
-                    Quero ser Consultor Sinergia
+                    Quero ser Consultor Energia Prospectar
                     <ArrowRight className="w-4 h-4 ml-1.5" />
                   </Button>
                 </a>

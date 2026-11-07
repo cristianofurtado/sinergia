@@ -124,7 +124,7 @@ export function Coverage() {
 
                   <a
                     href={`https://wa.me/5571987822230?text=${encodeURIComponent(
-                      `Olá! Gostaria de solicitar proposta da Sinergia para o estado de ${selectedState.name} (${selectedState.uf}) com desconto estimado de ${selectedState.discount}.`
+                      `Olá! Gostaria de solicitar proposta da Energia Prospectar para o estado de ${selectedState.name} (${selectedState.uf}) com desconto estimado de ${selectedState.discount}.`
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"

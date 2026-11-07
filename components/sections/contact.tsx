@@ -105,7 +105,7 @@ export function Contact() {
               <div className="space-y-2 pt-3 border-t border-slate-100">
                 <a
                   href={`https://wa.me/${member.phoneRaw}?text=${encodeURIComponent(
-                    `Olá, ${member.name}! Gostaria de conversar sobre economia de energia e soluções da Sinergia.`
+                    `Olá, ${member.name}! Gostaria de conversar sobre economia de energia e soluções da Energia Prospectar.`
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"

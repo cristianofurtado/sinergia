@@ -15,7 +15,7 @@ export function Footer() {
             <Link href="#inicio" className="inline-block p-2 rounded-xl bg-white shadow-xs">
               <Image
                 src="/logo-oficial.png"
-                alt="Sinergia"
+                alt="Energia Prospectar"
                 width={140}
                 height={36}
                 className="h-7 sm:h-8 w-auto object-contain"
@@ -117,7 +117,7 @@ export function Footer() {
 
         {/* Bottom Bar */}
         <div className="mt-10 pt-5 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-3">
-          <p>© {currentYear} Sinergia. Todos os direitos reservados.</p>
+          <p>© {currentYear} Energia Prospectar. Todos os direitos reservados.</p>
           <p className="text-[11px] text-slate-400">
             Geração Distribuída e Mercado Livre de Energia Elétrica.
           </p>

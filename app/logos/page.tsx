@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 export const metadata = {
-  title: "Galeria de Logos | Sinergia — 5 Propostas Oficiais (400x150px)",
+  title: "Galeria de Logos | Energia Prospectar — 5 Propostas Oficiais (400x150px)",
   description:
     "5 opções conceituais profissionais no formato 400x150px com tema de energia e visão para o futuro.",
 };

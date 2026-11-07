@@ -42,7 +42,7 @@ export function Hero() {
               </h1>
 
               <p className="text-sm sm:text-base text-sky-100/90 leading-relaxed font-normal max-w-2xl">
-                A <strong className="text-white font-bold">Sinergia</strong> conecta residências, empresas e corretores às maiores usinas de energia limpa do país. Reduza até 26% na sua conta de luz sem obras, sem placas solares e com suporte completo.
+                A <strong className="text-white font-bold">Energia Prospectar</strong> conecta residências, empresas e corretores às maiores usinas de energia limpa do país. Reduza até 26% na sua conta de luz sem obras, sem placas solares e com suporte completo.
               </p>
             </div>
 
@@ -150,7 +150,7 @@ export function Hero() {
 
                     <div className="pt-1 border-t border-slate-700/60 flex items-center justify-between">
                       <span className="text-[9px] sm:text-[10px] text-slate-300">
-                        Com Sinergia
+                        Com Energia Prospectar
                       </span>
                       <span className="text-lg sm:text-xl font-black text-amber-400 font-mono">
                         R$ {comSinergia.toLocaleString("pt-BR")},00
