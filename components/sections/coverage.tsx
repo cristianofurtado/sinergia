@@ -33,7 +33,7 @@ export function Coverage() {
     { uf: "ES", name: "Espírito Santo", discount: "15%", distributor: "EDP Espírito Santo", modalities: "Geração Distribuída e Mercado Livre" },
     { uf: "RJ", name: "Rio de Janeiro", discount: "15%", distributor: "Light / Enel RJ", modalities: "Geração Distribuída e Mercado Livre" },
     { uf: "PR", name: "Paraná", discount: "15%", distributor: "Copel", modalities: "Geração Distribuída e Mercado Livre" },
-    { uf: "SC", name: "Santa Catarina", discount: "15%", distributor: "Celesc", modalities: "Geração Distribuída e Mercado Livre" },
+    { uf: "SC", name: "Santa Catarina", discount: "12%", distributor: "Celesc", modalities: "Geração Distribuída e Mercado Livre" },
     { uf: "RS", name: "Rio Grande do Sul", discount: "15%", distributor: "RGE / CEEE Equatorial", modalities: "Geração Distribuída e Mercado Livre" },
     { uf: "SE", name: "Sergipe", discount: "16%", distributor: "Energisa Sergipe", modalities: "Geração Distribuída e Mercado Livre" },
   ];

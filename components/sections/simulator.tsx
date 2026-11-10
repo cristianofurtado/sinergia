@@ -54,7 +54,7 @@ export function Simulator() {
 
     // Sul (4)
     { name: "COPEL PR", rate: "15%", uf: "PR", region: "sul", id: "copel-pr" },
-    { name: "CELESC SC", rate: "15%", uf: "SC", region: "sul", id: "celesc-sc" },
+    { name: "CELESC SC", rate: "12%", uf: "SC", region: "sul", id: "celesc-sc" },
     { name: "RGE RS", rate: "15%", uf: "RS", region: "sul", id: "rge-rs" },
     { name: "EQUATORIAL CEEE/RS", rate: "15%", uf: "RS", region: "sul", id: "equatorial-ceee" },
   ];

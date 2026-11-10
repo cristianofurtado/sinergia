@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ShieldCheck, Mail, MapPin } from "lucide-react";
+import { ShieldCheck, MapPin } from "lucide-react";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -103,10 +103,6 @@ export function Footer() {
               Canais Oficiais
             </h4>
             <ul className="space-y-2 text-xs text-slate-300">
-              <li className="flex items-center gap-2">
-                <Mail className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span>contato@sinergia.tech</span>
-              </li>
               <li className="flex items-start gap-2">
                 <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
                 <span>Atendimento Nacional B2B & B2C</span>
