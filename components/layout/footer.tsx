@@ -94,6 +94,12 @@ export function Footer() {
                   +55 (11) 96641-3480 (SP / Sudeste)
                 </a>
               </li>
+              <li>
+                <strong className="text-white block font-semibold">Cleunes Lavratti</strong>
+                <a href="tel:+5565996097884" className="text-sky-200 hover:text-white transition-colors">
+                  +55 (65) 99609-7884 (MT / Centro-Oeste)
+                </a>
+              </li>
             </ul>
           </div>
 

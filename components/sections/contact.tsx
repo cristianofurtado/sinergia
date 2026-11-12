@@ -40,6 +40,13 @@ export function Contact() {
       phoneDisplay: "+55 (11) 96641-3480",
       region: "São Paulo & Região Sudeste",
     },
+    {
+      name: "Cleunes Lavratti",
+      photo: "/cleunes-lavratti.jpg",
+      phoneRaw: "5565996097884",
+      phoneDisplay: "+55 (65) 99609-7884",
+      region: "Mato Grosso & Centro-Oeste",
+    },
   ];
 
   return (
@@ -63,7 +70,7 @@ export function Contact() {
         </div>
 
         {/* Dedicated Team Contact Cards - Pure White for maximum contrast & crispness */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-5">
           {teamMembers.map((member) => (
             <div
               key={member.name}
