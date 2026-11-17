@@ -37,7 +37,7 @@ export default async function AdminPage() {
   ]);
 
   return (
-    <div className="space-y-4">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto w-full space-y-4">
       <h1 className="text-2xl font-extrabold text-[#0e526c]">Administração</h1>
       <AdminDashboard
         initialFiles={fileList}

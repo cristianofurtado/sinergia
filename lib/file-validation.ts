@@ -26,6 +26,8 @@ const ALLOWED_MIME_BY_CATEGORY: Record<Exclude<FileCategory, "text">, Set<string
     "application/vnd.openxmlformats-officedocument.presentationml.presentation",
     "text/plain",
     "text/csv",
+    "application/zip",
+    "application/x-zip-compressed",
   ]),
   image: new Set([
     "image/png",
@@ -78,6 +80,15 @@ export function resolveMimeType(fileName: string, rawMimeType?: string): string 
   const dot = fileName.lastIndexOf(".");
   const ext = dot >= 0 ? fileName.slice(dot).toLowerCase() : "";
   return EXT_TO_MIME[ext] ?? "application/octet-stream";
+}
+
+export function inferCategoryFromMime(mimeType: string): Exclude<FileCategory, "text"> {
+  if (mimeType.startsWith("video/")) return "video";
+  if (mimeType.startsWith("image/")) return "image";
+  if (mimeType === "application/json" || mimeType === "text/markdown" || mimeType === "application/zip" || mimeType === "application/x-zip-compressed") {
+    return "chat";
+  }
+  return "document";
 }
 
 export function validateFileUpload(

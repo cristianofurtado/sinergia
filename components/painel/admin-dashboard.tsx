@@ -183,9 +183,9 @@ export function AdminDashboard({
         setCustomTitle("");
         setFeedback({
           type: "success",
-          text: `${uploadedCount} arquivo(s) importado(s)! Abrindo seção...`,
+          text: `${uploadedCount} arquivo(s) publicado(s) no Chat Colaboradores!`,
         });
-        router.push(`/painel?categoria=${category}`);
+        router.push("/painel");
         router.refresh();
       }
     } catch (err) {
@@ -210,7 +210,7 @@ export function AdminDashboard({
     if (res.ok) {
       setTextTitle("");
       setTextBody("");
-      router.push("/painel?categoria=text");
+      router.push("/painel");
       router.refresh();
     } else {
       const err = (await res.json().catch(() => ({}))) as { error?: string };
@@ -320,10 +320,10 @@ export function AdminDashboard({
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-bold text-[#0e526c]">Importar Arquivos (R2)</h2>
                 <a
-                  href={`/painel?categoria=${category}`}
+                  href="/painel"
                   className="inline-flex items-center gap-1 text-xs font-semibold text-[#0e526c] hover:underline"
                 >
-                  <span>Abrir seção</span>
+                  <span>Abrir Chat Colaboradores</span>
                   <ExternalLink className="w-3 h-3" />
                 </a>
               </div>
