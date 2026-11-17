@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
         action: "upload",
         targetType: "file",
         targetId: id,
-        metadata: { category: body.category, sizeBytes: actualSize },
+        metadata: { category: body.category, title: body.title?.trim() || safeName, sizeBytes: actualSize },
       });
 
       return NextResponse.json({ id, status: "saved", category: body.category }, { status: 201 });
@@ -137,6 +137,7 @@ export async function POST(request: NextRequest) {
         action: "download",
         targetType: "file",
         targetId: file.id,
+        metadata: { title: file.title },
       });
 
       return NextResponse.json({ downloadUrl });

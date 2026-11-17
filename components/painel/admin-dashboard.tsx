@@ -25,9 +25,10 @@ interface AdminUserItem {
 
 interface AuditLogItem {
   id: string;
-  actorId: string;
-  action: string;
-  targetType: string;
+  actorName: string;
+  actorEmail: string;
+  actionLabel: string;
+  detail: string;
   createdAt: string;
 }
 
@@ -611,16 +612,31 @@ export function AdminDashboard({
       {activeTab === "auditoria" && (
         <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 space-y-4 shadow-xs">
           <h2 className="text-lg font-bold text-[#0e526c]">Logs de Auditoria Recentes</h2>
-          <ul className="divide-y divide-slate-100 text-xs text-slate-600">
-            {initialLogs.map((log) => (
-              <li key={log.id} className="py-2.5 flex flex-wrap justify-between gap-2">
-                <span>
-                  <strong className="text-slate-900">{log.action}</strong> ({log.targetType})
-                </span>
-                <span>{new Date(log.createdAt).toLocaleString("pt-BR")}</span>
-              </li>
-            ))}
-          </ul>
+          {initialLogs.length === 0 ? (
+            <p className="text-sm text-slate-500 py-4">Nenhum evento registrado ainda.</p>
+          ) : (
+            <ul className="divide-y divide-slate-100 text-xs sm:text-sm text-slate-700">
+              {initialLogs.map((log) => (
+                <li key={log.id} className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div className="min-w-0 space-y-0.5">
+                    <p className="break-words">
+                      <strong className="text-slate-900">{log.actorName}</strong>
+                      {log.actorEmail ? (
+                        <span className="text-slate-500 text-xs"> ({log.actorEmail})</span>
+                      ) : null}{" "}
+                      · <span className="font-semibold text-[#0e526c]">{log.actionLabel}</span>
+                    </p>
+                    {log.detail && (
+                      <p className="text-xs text-slate-600 break-words">Item: {log.detail}</p>
+                    )}
+                  </div>
+                  <span className="text-xs text-slate-500 shrink-0">
+                    {new Date(log.createdAt).toLocaleString("pt-BR")}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
       )}
     </div>

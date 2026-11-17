@@ -36,7 +36,13 @@ export async function POST(request: NextRequest) {
     updatedAt: nowIso,
   });
 
-  await logAudit({ actorId: user.id, action: "upload", targetType: "file", targetId: id, metadata: { category: "text" } });
+  await logAudit({
+    actorId: user.id,
+    action: "upload",
+    targetType: "file",
+    targetId: id,
+    metadata: { category: "text", title },
+  });
   return NextResponse.json({ id }, { status: 201 });
 }
 
@@ -68,7 +74,13 @@ export async function PATCH(request: NextRequest) {
     })
     .where(eq(files.id, existing.id));
 
-  await logAudit({ actorId: user.id, action: "rename", targetType: "file", targetId: existing.id });
+  await logAudit({
+    actorId: user.id,
+    action: "rename",
+    targetType: "file",
+    targetId: existing.id,
+    metadata: { title: body.title?.trim() || existing.title, category: body.category ?? existing.category },
+  });
   return NextResponse.json({ ok: true });
 }
 
@@ -90,7 +102,13 @@ export async function DELETE(request: NextRequest) {
     await deleteR2Object(existing.r2Key);
   }
   await db.delete(files).where(eq(files.id, existing.id));
-  await logAudit({ actorId: user.id, action: "delete", targetType: "file", targetId: existing.id });
+  await logAudit({
+    actorId: user.id,
+    action: "delete",
+    targetType: "file",
+    targetId: existing.id,
+    metadata: { title: existing.title, category: existing.category },
+  });
 
   return NextResponse.json({ ok: true });
 }
