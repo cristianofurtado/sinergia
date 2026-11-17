@@ -1,13 +1,17 @@
-[
-  {
-    "AllowedOrigins": [
-      "https://energiaprospectar.com.br",
-      "https://www.energiaprospectar.com.br",
-      "http://localhost:3000"
-    ],
-    "AllowedMethods": ["GET", "PUT", "HEAD"],
-    "AllowedHeaders": ["Content-Type"],
-    "ExposeHeaders": ["ETag"],
-    "MaxAgeSeconds": 3600
-  }
-]
+{
+  "rules": [
+    {
+      "allowed": {
+        "origins": [
+          "https://energiaprospectar.com.br",
+          "https://www.energiaprospectar.com.br",
+          "http://localhost:3000"
+        ],
+        "methods": ["GET", "PUT", "HEAD"],
+        "headers": ["Content-Type", "x-amz-*"]
+      },
+      "exposeHeaders": ["ETag"],
+      "maxAgeSeconds": 3600
+    }
+  ]
+}
