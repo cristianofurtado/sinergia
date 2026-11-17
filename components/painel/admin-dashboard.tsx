@@ -31,18 +31,31 @@ interface AuditLogItem {
   createdAt: string;
 }
 
-type UploadCategory = "video" | "chat" | "document" | "image";
+type UploadCategory = "video" | "document" | "image";
 type AdminTab = "conteudo" | "usuarios" | "auditoria";
 
-const CATEGORY_OPTIONS: { value: UploadCategory; label: string }[] = [
-  { value: "video", label: "Vídeos" },
-  { value: "chat", label: "Chats" },
-  { value: "document", label: "Documentos" },
-  { value: "image", label: "Imagens e GIFs" },
+const CATEGORY_OPTIONS: { value: UploadCategory; label: string; hint: string }[] = [
+  {
+    value: "video",
+    label: "Vídeos",
+    hint: "Formatos aceitos: MP4, WEBM, MOV, AVI, MKV (até 500 MB por arquivo)",
+  },
+  {
+    value: "document",
+    label: "Documentos",
+    hint: "Formatos aceitos: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, CSV, ZIP (até 50 MB por arquivo)",
+  },
+  {
+    value: "image",
+    label: "Imagens e GIFs",
+    hint: "Formatos aceitos: PNG, JPG, JPEG, WEBP, GIF, SVG (até 20 MB por arquivo)",
+  },
 ];
 
 const ALL_CATEGORIES: { value: PainelFileItem["category"]; label: string }[] = [
-  ...CATEGORY_OPTIONS,
+  { value: "video", label: "Vídeos" },
+  { value: "document", label: "Documentos" },
+  { value: "image", label: "Imagens e GIFs" },
   { value: "text", label: "Textos" },
 ];
 
@@ -343,6 +356,20 @@ export function AdminDashboard({
                   >
                     {opt.label}
                   </button>
+                ))}
+              </div>
+
+              <div className="rounded-xl bg-slate-50 border border-slate-200 px-3.5 py-2.5 text-xs text-slate-600 space-y-1">
+                <p className="font-semibold text-slate-800">
+                  O que pode importar em cada opção:
+                </p>
+                {CATEGORY_OPTIONS.map((opt) => (
+                  <p
+                    key={opt.value}
+                    className={category === opt.value ? "text-[#0e526c] font-semibold" : ""}
+                  >
+                    <strong>{opt.label}:</strong> {opt.hint.replace("Formatos aceitos: ", "")}
+                  </p>
                 ))}
               </div>
 

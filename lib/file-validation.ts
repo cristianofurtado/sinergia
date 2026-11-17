@@ -85,9 +85,6 @@ export function resolveMimeType(fileName: string, rawMimeType?: string): string 
 export function inferCategoryFromMime(mimeType: string): Exclude<FileCategory, "text"> {
   if (mimeType.startsWith("video/")) return "video";
   if (mimeType.startsWith("image/")) return "image";
-  if (mimeType === "application/json" || mimeType === "text/markdown" || mimeType === "application/zip" || mimeType === "application/x-zip-compressed") {
-    return "chat";
-  }
   return "document";
 }
 
