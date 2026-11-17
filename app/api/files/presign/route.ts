@@ -32,6 +32,7 @@ export async function POST(request: NextRequest) {
       action?: "put" | "confirm" | "get";
       category?: Exclude<FileCategory, "text">;
       title?: string;
+      textBody?: string;
       mimeType?: string;
       sizeBytes?: number;
       fileName?: string;
@@ -97,7 +98,7 @@ export async function POST(request: NextRequest) {
         r2Key: body.r2Key,
         mimeType: actualType,
         sizeBytes: actualSize,
-        textBody: null,
+        textBody: body.textBody?.trim() || null,
         uploadedBy: user.id,
         createdAt: nowIso,
         updatedAt: nowIso,

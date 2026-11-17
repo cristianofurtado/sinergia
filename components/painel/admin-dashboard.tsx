@@ -10,10 +10,12 @@ import {
   X,
   ExternalLink,
   Users,
-  FileText,
   History,
   FolderPlus,
+  Send,
+  Paperclip,
 } from "lucide-react";
+import { inferCategoryFromMime, resolveMimeType } from "@/lib/file-validation";
 import type { PainelFileItem } from "./colaborador-browser";
 
 interface AdminUserItem {
@@ -32,24 +34,25 @@ interface AuditLogItem {
   createdAt: string;
 }
 
-type UploadCategory = "video" | "document" | "image";
+type UploadCategory = "auto" | "video" | "document" | "image";
 type AdminTab = "conteudo" | "usuarios" | "auditoria";
 
-const CATEGORY_OPTIONS: { value: UploadCategory; label: string; hint: string }[] = [
+const CATEGORY_OPTIONS: { value: UploadCategory; label: string; hint?: string }[] = [
+  { value: "auto", label: "Automático" },
   {
     value: "video",
     label: "Vídeos",
-    hint: "Formatos aceitos: MP4, WEBM, MOV, AVI, MKV (até 500 MB por arquivo)",
+    hint: "MP4, WEBM, MOV, AVI, MKV (até 500 MB por arquivo)",
   },
   {
     value: "document",
     label: "Documentos",
-    hint: "Formatos aceitos: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, CSV, ZIP (até 50 MB por arquivo)",
+    hint: "PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, CSV, ZIP (até 50 MB por arquivo)",
   },
   {
     value: "image",
     label: "Imagens e GIFs",
-    hint: "Formatos aceitos: PNG, JPG, JPEG, WEBP, GIF, SVG (até 20 MB por arquivo)",
+    hint: "PNG, JPG, JPEG, WEBP, GIF, SVG (até 20 MB por arquivo)",
   },
 ];
 
@@ -74,17 +77,15 @@ export function AdminDashboard({
   const [files, setFiles] = useState(initialFiles);
   const [users, setUsers] = useState(initialUsers);
 
-  // Upload
-  const [category, setCategory] = useState<UploadCategory>("document");
-  const [customTitle, setCustomTitle] = useState("");
-  const [isDragging, setIsDragging] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [progress, setProgress] = useState<string>("");
-
-  // Texto personalizado
-  const [textTitle, setTextTitle] = useState("");
-  const [textBody, setTextBody] = useState("");
+  // Compositor unificado (Arquivo e/ou Texto)
+  const [category, setCategory] = useState<UploadCategory>("auto");
+  const [postTitle, setPostTitle] = useState("");
+  const [postText, setPostText] = useState("");
   const [textPreview, setTextPreview] = useState(false);
+  const [queuedFiles, setQueuedFiles] = useState<File[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [progress, setProgress] = useState<string>("");
 
   // Edição inline na lista
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -99,29 +100,76 @@ export function AdminDashboard({
     return files.filter((f) => f.category === filterCat);
   }, [files, filterCat]);
 
-  async function uploadFiles(selectedFiles: File[]) {
-    if (selectedFiles.length === 0 || isUploading) return;
+  function addFilesToQueue(incoming: File[]) {
+    if (incoming.length === 0) return;
+    setQueuedFiles((prev) => [...prev, ...incoming]);
+    setFeedback(null);
+  }
+
+  function removeQueuedFile(index: number) {
+    setQueuedFiles((prev) => prev.filter((_, idx) => idx !== index));
+  }
+
+  async function handlePublish(e: React.FormEvent) {
+    e.preventDefault();
+    if (isPublishing) return;
+
+    const cleanTitle = postTitle.trim();
+    const cleanText = postText.trim();
+
+    if (queuedFiles.length === 0 && !cleanText) {
+      setFeedback({
+        type: "error",
+        text: "Escreva um texto ou anexe pelo menos um arquivo antes de publicar.",
+      });
+      return;
+    }
 
     setFeedback(null);
-    setIsUploading(true);
-    let uploadedCount = 0;
+    setIsPublishing(true);
 
     try {
-      for (let i = 0; i < selectedFiles.length; i++) {
-        const file = selectedFiles[i];
+      // Caso 1: apenas texto (sem anexos)
+      if (queuedFiles.length === 0) {
+        setProgress("Publicando mensagem de texto...");
+        const derivedTitle = cleanTitle || cleanText.split("\n")[0].slice(0, 80);
+        const res = await fetch("/api/admin/files", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ title: derivedTitle, textBody: cleanText }),
+        });
+        if (!res.ok) {
+          const err = (await res.json().catch(() => ({}))) as { error?: string };
+          setFeedback({ type: "error", text: err.error ?? "Erro ao publicar texto." });
+          return;
+        }
+
+        setPostTitle("");
+        setPostText("");
+        router.push("/painel");
+        router.refresh();
+        return;
+      }
+
+      // Caso 2: 1 ou mais arquivos (com ou sem legenda/texto junto)
+      let uploadedCount = 0;
+      for (let i = 0; i < queuedFiles.length; i++) {
+        const file = queuedFiles[i];
+        const mimeType = resolveMimeType(file.name, file.type);
+        const targetCat = category === "auto" ? inferCategoryFromMime(mimeType) : category;
         const titleToUse =
-          selectedFiles.length === 1 && customTitle.trim() ? customTitle.trim() : file.name;
+          queuedFiles.length === 1 && cleanTitle ? cleanTitle : file.name;
+        const captionToUse = i === 0 && cleanText ? cleanText : undefined;
 
-        setProgress(`[${i + 1}/${selectedFiles.length}] Preparando ${file.name}...`);
-
+        setProgress(`[${i + 1}/${queuedFiles.length}] Preparando ${file.name}...`);
         const presignRes = await fetch("/api/files/presign", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             action: "put",
-            category,
+            category: targetCat,
             title: titleToUse,
-            mimeType: file.type || "application/octet-stream",
+            mimeType,
             sizeBytes: file.size,
             fileName: file.name,
           }),
@@ -137,23 +185,23 @@ export function AdminDashboard({
         if (!presignRes.ok || !presignData.uploadUrl || !presignData.r2Key) {
           setFeedback({
             type: "error",
-            text: presignData.error ?? `Erro ao gerar URL assinada para ${file.name}`,
+            text: presignData.error ?? `Erro ao preparar envio de ${file.name}`,
           });
           continue;
         }
 
-        setProgress(`[${i + 1}/${selectedFiles.length}] Enviando ${file.name} para o R2...`);
+        setProgress(`[${i + 1}/${queuedFiles.length}] Enviando ${file.name} para o R2...`);
         let putRes: Response;
         try {
           putRes = await fetch(presignData.uploadUrl, {
             method: "PUT",
-            headers: { "Content-Type": presignData.contentType || "application/octet-stream" },
+            headers: { "Content-Type": presignData.contentType || mimeType },
             body: file,
           });
         } catch {
           setFeedback({
             type: "error",
-            text: `Falha de rede/CORS ao enviar ${file.name} para o R2. Verifique o CORS do bucket.`,
+            text: `Falha de rede/CORS ao enviar ${file.name} para o R2.`,
           });
           continue;
         }
@@ -166,15 +214,16 @@ export function AdminDashboard({
           continue;
         }
 
-        setProgress(`[${i + 1}/${selectedFiles.length}] Salvando ${file.name}...`);
+        setProgress(`[${i + 1}/${queuedFiles.length}] Confirmando ${file.name}...`);
         const confirmRes = await fetch("/api/files/presign", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             action: "confirm",
-            category,
+            category: targetCat,
             title: titleToUse,
-            mimeType: presignData.contentType || file.type || "application/octet-stream",
+            textBody: captionToUse,
+            mimeType: presignData.contentType || mimeType,
             sizeBytes: file.size,
             fileName: file.name,
             r2Key: presignData.r2Key,
@@ -194,10 +243,12 @@ export function AdminDashboard({
       }
 
       if (uploadedCount > 0) {
-        setCustomTitle("");
+        setPostTitle("");
+        setPostText("");
+        setQueuedFiles([]);
         setFeedback({
           type: "success",
-          text: `${uploadedCount} arquivo(s) publicado(s) no Chat Colaboradores!`,
+          text: `${uploadedCount} item(ns) publicado(s) no Chat Colaboradores!`,
         });
         router.push("/painel");
         router.refresh();
@@ -205,30 +256,11 @@ export function AdminDashboard({
     } catch (err) {
       setFeedback({
         type: "error",
-        text: err instanceof Error ? err.message : "Erro inesperado durante o upload.",
+        text: err instanceof Error ? err.message : "Erro inesperado ao publicar.",
       });
     } finally {
-      setIsUploading(false);
+      setIsPublishing(false);
       setProgress("");
-    }
-  }
-
-  async function handleCreateText(e: React.FormEvent) {
-    e.preventDefault();
-    setFeedback(null);
-    const res = await fetch("/api/admin/files", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: textTitle, textBody }),
-    });
-    if (res.ok) {
-      setTextTitle("");
-      setTextBody("");
-      router.push("/painel");
-      router.refresh();
-    } else {
-      const err = (await res.json().catch(() => ({}))) as { error?: string };
-      setFeedback({ type: "error", text: err.error ?? "Erro ao salvar texto." });
     }
   }
 
@@ -285,7 +317,7 @@ export function AdminDashboard({
           }`}
         >
           <FolderPlus className="w-4 h-4" />
-          Conteúdo e Uploads ({files.length})
+          Conteúdo e Publicação ({files.length})
         </button>
         <button
           type="button"
@@ -328,147 +360,195 @@ export function AdminDashboard({
 
       {activeTab === "conteudo" && (
         <div className="space-y-6">
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            {/* Upload personalizado R2 */}
-            <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 space-y-4 shadow-xs">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-bold text-[#0e526c]">Importar Arquivos (R2)</h2>
-                <a
-                  href="/painel"
-                  className="inline-flex items-center gap-1 text-xs font-semibold text-[#0e526c] hover:underline"
-                >
-                  <span>Abrir Chat Colaboradores</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              </div>
-
-              <div className="flex flex-wrap gap-2">
-                {CATEGORY_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    disabled={isUploading}
-                    onClick={() => setCategory(opt.value)}
-                    className={`rounded-lg px-3 py-1.5 text-xs font-bold transition-colors ${
-                      category === opt.value
-                        ? "bg-[#0e526c] text-white"
-                        : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-
-              <div className="rounded-xl bg-slate-50 border border-slate-200 px-3.5 py-2.5 text-xs text-slate-600 space-y-1">
-                <p className="font-semibold text-slate-800">
-                  O que pode importar em cada opção:
-                </p>
-                {CATEGORY_OPTIONS.map((opt) => (
-                  <p
-                    key={opt.value}
-                    className={category === opt.value ? "text-[#0e526c] font-semibold" : ""}
-                  >
-                    <strong>{opt.label}:</strong> {opt.hint.replace("Formatos aceitos: ", "")}
-                  </p>
-                ))}
-              </div>
-
-              <input
-                type="text"
-                disabled={isUploading}
-                value={customTitle}
-                onChange={(e) => setCustomTitle(e.target.value)}
-                placeholder="Título personalizado (opcional para 1 arquivo)"
-                className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0e526c]"
-              />
-
-              <label
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setIsDragging(true);
-                }}
-                onDragLeave={() => setIsDragging(false)}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  setIsDragging(false);
-                  uploadFiles(Array.from(e.dataTransfer.files));
-                }}
-                className={`flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-6 text-center cursor-pointer transition-colors ${
-                  isDragging
-                    ? "border-[#0e526c] bg-sky-50"
-                    : "border-slate-300 bg-slate-50/70 hover:border-[#0e526c]/60"
-                }`}
-              >
-                <UploadCloud className="w-8 h-8 text-[#0e526c] mb-2" />
-                <span className="text-sm font-semibold text-slate-800">
-                  {isUploading ? progress : "Clique para escolher ou arraste arquivos aqui"}
-                </span>
-                <span className="text-xs text-slate-500 mt-1">
-                  Destino selecionado:{" "}
-                  <strong>{CATEGORY_OPTIONS.find((o) => o.value === category)?.label}</strong>
-                </span>
-                <input
-                  type="file"
-                  multiple
-                  disabled={isUploading}
-                  onChange={(e) => {
-                    const list = Array.from(e.target.files ?? []);
-                    e.target.value = "";
-                    uploadFiles(list);
-                  }}
-                  className="sr-only"
-                />
-              </label>
-            </section>
-
-            {/* Editor de Texto */}
-            <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 space-y-4 shadow-xs">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-bold text-[#0e526c] flex items-center gap-2">
-                  <FileText className="w-5 h-5" />
-                  Publicar Texto Interno
+          {/* Card único: Nova Publicação (Arquivos e/ou Texto) */}
+          <form
+            onSubmit={handlePublish}
+            className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 space-y-5 shadow-xs"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h2 className="text-lg font-bold text-[#0e526c]">
+                  Nova Publicação no Chat Colaboradores
                 </h2>
-                <button
-                  type="button"
-                  onClick={() => setTextPreview((v) => !v)}
-                  className="text-xs font-semibold text-[#0e526c] hover:underline"
-                >
-                  {textPreview ? "Editar" : "Pré-visualizar"}
-                </button>
+                <p className="text-xs text-slate-500">
+                  Envie só texto, só arquivo(s), ou arquivo(s) com texto/legenda juntos.
+                </p>
               </div>
-              <form onSubmit={handleCreateText} className="space-y-3">
+              <a
+                href="/painel"
+                className="inline-flex items-center gap-1 text-xs font-semibold text-[#0e526c] hover:underline"
+              >
+                <span>Abrir Chat Colaboradores</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              {/* Lado Texto / Título */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <label htmlFor="post-title" className="text-xs font-bold text-slate-700">
+                    Título (opcional)
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setTextPreview((v) => !v)}
+                    className="text-xs font-semibold text-[#0e526c] hover:underline"
+                  >
+                    {textPreview ? "Editar texto" : "Pré-visualizar texto"}
+                  </button>
+                </div>
+
                 <input
+                  id="post-title"
                   type="text"
-                  required
-                  value={textTitle}
-                  onChange={(e) => setTextTitle(e.target.value)}
-                  placeholder="Título do comunicado ou roteiro"
+                  disabled={isPublishing}
+                  value={postTitle}
+                  onChange={(e) => setPostTitle(e.target.value)}
+                  placeholder="Ex.: Treinamento Comercial ou Tabela Atualizada"
                   className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0e526c]"
                 />
+
                 {textPreview ? (
-                  <pre className="whitespace-pre-wrap text-sm text-slate-800 bg-slate-50 border border-slate-200 rounded-xl p-3.5 min-h-[124px]">
-                    {textBody || "Nada para pré-visualizar."}
+                  <pre className="whitespace-pre-wrap text-sm text-slate-800 bg-slate-50 border border-slate-200 rounded-xl p-3.5 min-h-[140px]">
+                    {postText || "Nada para pré-visualizar."}
                   </pre>
                 ) : (
                   <textarea
-                    required
-                    rows={5}
-                    value={textBody}
-                    onChange={(e) => setTextBody(e.target.value)}
-                    placeholder="Escreva o conteúdo em texto ou Markdown..."
+                    rows={6}
+                    disabled={isPublishing}
+                    value={postText}
+                    onChange={(e) => setPostText(e.target.value)}
+                    placeholder="Escreva a mensagem, aviso ou legenda que acompanha os arquivos..."
                     className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0e526c]"
                   />
                 )}
-                <button
-                  type="submit"
-                  className="w-full sm:w-auto rounded-xl bg-[#0e526c] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#0b4156]"
+              </div>
+
+              {/* Lado Arquivos (R2) */}
+              <div className="space-y-3">
+                <div className="flex flex-wrap gap-2">
+                  {CATEGORY_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      disabled={isPublishing}
+                      onClick={() => setCategory(opt.value)}
+                      className={`rounded-lg px-3 py-1.5 text-xs font-bold transition-colors ${
+                        category === opt.value
+                          ? "bg-[#0e526c] text-white"
+                          : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="rounded-xl bg-slate-50 border border-slate-200 px-3.5 py-2.5 text-xs text-slate-600 space-y-1">
+                  <p className="font-semibold text-slate-800">
+                    O que pode importar em cada opção:
+                  </p>
+                  {CATEGORY_OPTIONS.filter((o) => o.hint).map((opt) => (
+                    <p
+                      key={opt.value}
+                      className={category === opt.value ? "text-[#0e526c] font-semibold" : ""}
+                    >
+                      <strong>{opt.label}:</strong> {opt.hint}
+                    </p>
+                  ))}
+                </div>
+
+                <label
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setIsDragging(true);
+                  }}
+                  onDragLeave={() => setIsDragging(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setIsDragging(false);
+                    addFilesToQueue(Array.from(e.dataTransfer.files));
+                  }}
+                  className={`flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-5 text-center cursor-pointer transition-colors ${
+                    isDragging
+                      ? "border-[#0e526c] bg-sky-50"
+                      : "border-slate-300 bg-slate-50/70 hover:border-[#0e526c]/60"
+                  }`}
                 >
-                  Publicar texto
-                </button>
-              </form>
-            </section>
-          </div>
+                  <UploadCloud className="w-7 h-7 text-[#0e526c] mb-1.5" />
+                  <span className="text-sm font-semibold text-slate-800">
+                    Clique para anexar ou arraste arquivos aqui (opcional)
+                  </span>
+                  <span className="text-xs text-slate-500 mt-0.5">
+                    Tipo selecionado:{" "}
+                    <strong>{CATEGORY_OPTIONS.find((o) => o.value === category)?.label}</strong>
+                  </span>
+                  <input
+                    type="file"
+                    multiple
+                    disabled={isPublishing}
+                    onChange={(e) => {
+                      const list = Array.from(e.target.files ?? []);
+                      e.target.value = "";
+                      addFilesToQueue(list);
+                    }}
+                    className="sr-only"
+                  />
+                </label>
+
+                {queuedFiles.length > 0 && (
+                  <ul className="space-y-1.5 max-h-32 overflow-y-auto">
+                    {queuedFiles.map((file, idx) => (
+                      <li
+                        key={`${file.name}-${idx}`}
+                        className="flex items-center justify-between gap-2 rounded-lg bg-slate-100 px-3 py-1.5 text-xs"
+                      >
+                        <span className="inline-flex items-center gap-1.5 truncate font-medium text-slate-800">
+                          <Paperclip className="w-3.5 h-3.5 text-[#0e526c] shrink-0" />
+                          <span className="truncate">{file.name}</span>
+                          <span className="text-slate-500 shrink-0">
+                            ({(file.size / 1024).toFixed(0)} KB)
+                          </span>
+                        </span>
+                        <button
+                          type="button"
+                          disabled={isPublishing}
+                          onClick={() => removeQueuedFile(idx)}
+                          aria-label={`Remover ${file.name}`}
+                          className="text-slate-500 hover:text-red-600"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100">
+              <span className="text-xs font-semibold text-[#0e526c]">
+                {progress ||
+                  (queuedFiles.length > 0 && postText.trim()
+                    ? `Pronto para publicar ${queuedFiles.length} arquivo(s) com legenda.`
+                    : queuedFiles.length > 0
+                      ? `Pronto para publicar ${queuedFiles.length} arquivo(s).`
+                      : postText.trim()
+                        ? "Pronto para publicar mensagem de texto."
+                        : "Anexe arquivo(s) e/ou escreva um texto para publicar.")}
+              </span>
+
+              <button
+                type="submit"
+                disabled={isPublishing || (queuedFiles.length === 0 && !postText.trim())}
+                className="inline-flex items-center gap-2 rounded-xl bg-[#0e526c] px-6 py-2.5 text-sm font-bold text-white hover:bg-[#0b4156] disabled:opacity-40 transition-colors"
+              >
+                <Send className="w-4 h-4" />
+                <span>{isPublishing ? "Publicando..." : "Publicar"}</span>
+              </button>
+            </div>
+          </form>
 
           {/* Gerenciar Arquivos e Textos */}
           <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 space-y-4 shadow-xs">

@@ -336,6 +336,11 @@ export function ChatColaboradores({
                         />
                       </button>
                       <p className="text-xs text-slate-600 break-words">{item.title}</p>
+                      {item.textBody && (
+                        <p className="text-sm text-slate-800 whitespace-pre-wrap leading-relaxed break-words pt-1">
+                          {item.textBody}
+                        </p>
+                      )}
                     </div>
                   )}
 
@@ -348,40 +353,52 @@ export function ChatColaboradores({
                         className="w-full max-h-80 rounded-xl bg-black"
                       />
                       <p className="text-xs text-slate-600 break-words">{item.title}</p>
+                      {item.textBody && (
+                        <p className="text-sm text-slate-800 whitespace-pre-wrap leading-relaxed break-words pt-1">
+                          {item.textBody}
+                        </p>
+                      )}
                     </div>
                   )}
 
                   {(item.category === "document" || item.category === "chat") && (
-                    <div className="flex items-center gap-3 rounded-xl bg-slate-50 border border-slate-200/80 p-3">
-                      <div className="w-10 h-10 rounded-lg bg-[#0e526c]/10 text-[#0e526c] flex items-center justify-center shrink-0">
-                        <FileText className="w-5 h-5" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs sm:text-sm font-bold text-slate-900 truncate">
-                          {item.title}
-                        </p>
-                        <p className="text-[11px] text-slate-500">{sizeLabel}</p>
-                      </div>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        {item.mimeType === "application/pdf" && item.mediaUrl && (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-3 rounded-xl bg-slate-50 border border-slate-200/80 p-3">
+                        <div className="w-10 h-10 rounded-lg bg-[#0e526c]/10 text-[#0e526c] flex items-center justify-center shrink-0">
+                          <FileText className="w-5 h-5" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs sm:text-sm font-bold text-slate-900 truncate">
+                            {item.title}
+                          </p>
+                          <p className="text-[11px] text-slate-500">{sizeLabel}</p>
+                        </div>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          {item.mimeType === "application/pdf" && item.mediaUrl && (
+                            <button
+                              type="button"
+                              onClick={() => setLightbox({ item, url: item.mediaUrl! })}
+                              title="Visualizar"
+                              className="rounded-lg bg-[#0e526c] p-2 text-white hover:bg-[#0b4156]"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                          )}
                           <button
                             type="button"
-                            onClick={() => setLightbox({ item, url: item.mediaUrl! })}
-                            title="Visualizar"
-                            className="rounded-lg bg-[#0e526c] p-2 text-white hover:bg-[#0b4156]"
+                            onClick={() => handleDownload(item)}
+                            title="Baixar"
+                            className="rounded-lg border border-slate-300 bg-white p-2 text-slate-700 hover:bg-slate-100"
                           >
-                            <Eye className="w-4 h-4" />
+                            <Download className="w-4 h-4" />
                           </button>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => handleDownload(item)}
-                          title="Baixar"
-                          className="rounded-lg border border-slate-300 bg-white p-2 text-slate-700 hover:bg-slate-100"
-                        >
-                          <Download className="w-4 h-4" />
-                        </button>
+                        </div>
                       </div>
+                      {item.textBody && (
+                        <p className="text-sm text-slate-800 whitespace-pre-wrap leading-relaxed break-words">
+                          {item.textBody}
+                        </p>
+                      )}
                     </div>
                   )}
 
