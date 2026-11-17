@@ -11,7 +11,7 @@ export default async function PainelPage({
   searchParams: Promise<{ categoria?: string }>;
 }) {
   const params = await searchParams;
-  const category = params.categoria ?? "document";
+  const category = params.categoria ?? "all";
   const items = process.env.TURSO_DATABASE_URL?.trim()
     ? await getDb().select().from(files).orderBy(desc(files.createdAt))
     : [];
