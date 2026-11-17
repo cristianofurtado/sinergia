@@ -9,6 +9,7 @@ import {
   createUserSession,
   isAdminEmail,
   logAudit,
+  verifySignedPayload,
   type UserRole,
 } from "@/lib/auth";
 
@@ -35,14 +36,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL("/login?error=oauth_state", origin));
   }
 
-  let parsedCookie: { state: string; codeVerifier: string };
-  try {
-    parsedCookie = JSON.parse(oauthCookie) as { state: string; codeVerifier: string };
-  } catch {
-    return NextResponse.redirect(new URL("/login?error=oauth_cookie", origin));
-  }
-
-  if (parsedCookie.state !== state) {
+  const parsedCookie = verifySignedPayload<{ state: string; codeVerifier: string }>(oauthCookie);
+  if (!parsedCookie || parsedCookie.state !== state) {
     return NextResponse.redirect(new URL("/login?error=oauth_mismatch", origin));
   }
 

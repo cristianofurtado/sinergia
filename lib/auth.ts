@@ -1,7 +1,7 @@
 import "server-only";
 import crypto from "node:crypto";
 import { cookies } from "next/headers";
-import { eq, and, gt } from "drizzle-orm";
+import { eq, and, gt, inArray } from "drizzle-orm";
 import { getDb } from "@/db";
 import { sessions, users, auditLogs } from "@/db/schema";
 
@@ -19,8 +19,50 @@ export interface SessionUser {
 export const SESSION_COOKIE_NAME = "ep_session";
 const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 7; // 7 dias
 
+function getAuthSecret(): string {
+  const secret = process.env.AUTH_SECRET?.trim();
+  if (!secret || secret.length < 16) {
+    throw new Error("AUTH_SECRET ausente ou muito curto.");
+  }
+  return secret;
+}
+
 export function hashToken(token: string): string {
+  return crypto.createHmac("sha256", getAuthSecret()).update(token).digest("hex");
+}
+
+function legacySha256(token: string): string {
   return crypto.createHash("sha256").update(token).digest("hex");
+}
+
+export function signPayload(payloadJson: string): string {
+  const sig = crypto
+    .createHmac("sha256", getAuthSecret())
+    .update(payloadJson)
+    .digest("base64url");
+  const data = Buffer.from(payloadJson, "utf8").toString("base64url");
+  return `${data}.${sig}`;
+}
+
+export function verifySignedPayload<T>(signedValue: string): T | null {
+  const parts = signedValue.split(".");
+  if (parts.length !== 2) return null;
+  const [dataB64, sigB64] = parts;
+  try {
+    const payloadJson = Buffer.from(dataB64, "base64url").toString("utf8");
+    const expectedSig = crypto
+      .createHmac("sha256", getAuthSecret())
+      .update(payloadJson)
+      .digest("base64url");
+    const a = Buffer.from(sigB64);
+    const b = Buffer.from(expectedSig);
+    if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
+      return null;
+    }
+    return JSON.parse(payloadJson) as T;
+  } catch {
+    return null;
+  }
 }
 
 export function isAdminEmail(email: string): boolean {
@@ -39,7 +81,9 @@ export async function getSessionUser(): Promise<SessionUser | null> {
 
   const db = getDb();
   const nowIso = new Date().toISOString();
-  const tokenHash = hashToken(token);
+  const hashes = process.env.AUTH_SECRET?.trim()
+    ? [hashToken(token), legacySha256(token)]
+    : [legacySha256(token)];
 
   const rows = await db
     .select({
@@ -52,7 +96,7 @@ export async function getSessionUser(): Promise<SessionUser | null> {
     })
     .from(sessions)
     .innerJoin(users, eq(sessions.userId, users.id))
-    .where(and(eq(sessions.tokenHash, tokenHash), gt(sessions.expiresAt, nowIso)))
+    .where(and(inArray(sessions.tokenHash, hashes), gt(sessions.expiresAt, nowIso)))
     .limit(1);
 
   const row = rows[0];
@@ -77,7 +121,10 @@ export async function createUserSession(userId: string): Promise<{ token: string
 export async function revokeSessionByToken(token: string): Promise<void> {
   if (!process.env.TURSO_DATABASE_URL?.trim()) return;
   const db = getDb();
-  await db.delete(sessions).where(eq(sessions.tokenHash, hashToken(token)));
+  const hashes = process.env.AUTH_SECRET?.trim()
+    ? [hashToken(token), legacySha256(token)]
+    : [legacySha256(token)];
+  await db.delete(sessions).where(inArray(sessions.tokenHash, hashes));
 }
 
 export async function logAudit(params: {

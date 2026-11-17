@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
+import { signPayload } from "@/lib/auth";
 import { getRequiredEnv } from "@/lib/env";
 
 const OAUTH_COOKIE = "ep_oauth_state";
@@ -7,6 +8,7 @@ const OAUTH_COOKIE = "ep_oauth_state";
 export async function GET(request: NextRequest) {
   try {
     const clientId = getRequiredEnv("GOOGLE_CLIENT_ID");
+    getRequiredEnv("AUTH_SECRET");
     const origin = request.nextUrl.origin;
     const redirectUri = `${origin}/api/auth/callback/google`;
 
@@ -27,8 +29,10 @@ export async function GET(request: NextRequest) {
     authUrl.searchParams.set("code_challenge_method", "S256");
     authUrl.searchParams.set("prompt", "select_account");
 
+    const signedCookie = signPayload(JSON.stringify({ state, codeVerifier }));
+
     const response = NextResponse.redirect(authUrl);
-    response.cookies.set(OAUTH_COOKIE, JSON.stringify({ state, codeVerifier }), {
+    response.cookies.set(OAUTH_COOKIE, signedCookie, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",

@@ -18,9 +18,14 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# Variáveis locais
+# Variáveis locais e segredos
 .env*.local
 .env
+.dev.vars
+*.key
+*.pem
+client_secret*.json
+local.db*
 
 # Sistema operacional
 .DS_Store
