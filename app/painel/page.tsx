@@ -3,6 +3,8 @@ import { getDb } from "@/db";
 import { files } from "@/db/schema";
 import { ColaboradorBrowser } from "@/components/painel/colaborador-browser";
 
+export const dynamic = "force-dynamic";
+
 export default async function PainelPage({
   searchParams,
 }: {

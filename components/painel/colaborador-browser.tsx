@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+import Link from "next/link";
 
 export interface PainelFileItem {
   id: string;
@@ -13,6 +14,14 @@ export interface PainelFileItem {
   createdAt: string;
 }
 
+const CATEGORIES = [
+  { key: "video", label: "Vídeos" },
+  { key: "chat", label: "Chats" },
+  { key: "document", label: "Documentos" },
+  { key: "image", label: "Imagens e GIFs" },
+  { key: "text", label: "Textos" },
+] as const;
+
 export function ColaboradorBrowser({
   items,
   category,
@@ -22,8 +31,13 @@ export function ColaboradorBrowser({
 }) {
   const [query, setQuery] = useState("");
   const [sortDesc, setSortDesc] = useState(true);
-  const [previewUrl, setPreviewUrl] = useState<{ url: string; item: PainelFileItem } | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<{
+    url: string;
+    item: PainelFileItem;
+    chatContent?: string;
+  } | null>(null);
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -35,6 +49,7 @@ export function ColaboradorBrowser({
   }, [items, category, query, sortDesc]);
 
   async function openItem(item: PainelFileItem, downloadOnly = false) {
+    setErrorMsg(null);
     if (item.category === "text") {
       setPreviewUrl({ url: "", item });
       return;
@@ -46,14 +61,30 @@ export function ColaboradorBrowser({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "get", fileId: item.id }),
       });
-      const data = (await res.json()) as { downloadUrl?: string };
-      if (data.downloadUrl) {
-        if (downloadOnly) {
-          window.open(data.downloadUrl, "_blank", "noopener,noreferrer");
-        } else {
-          setPreviewUrl({ url: data.downloadUrl, item });
-        }
+      const data = (await res.json().catch(() => ({}))) as { downloadUrl?: string; error?: string };
+      if (!res.ok || !data.downloadUrl) {
+        setErrorMsg(data.error ?? "Não foi possível abrir o arquivo.");
+        return;
       }
+
+      if (downloadOnly) {
+        window.open(data.downloadUrl, "_blank", "noopener,noreferrer");
+        return;
+      }
+
+      if (
+        item.category === "chat" &&
+        (item.mimeType.startsWith("text/") || item.mimeType === "application/json")
+      ) {
+        const textRes = await fetch(data.downloadUrl).catch(() => null);
+        const chatContent = textRes?.ok ? await textRes.text() : undefined;
+        setPreviewUrl({ url: data.downloadUrl, item, chatContent });
+        return;
+      }
+
+      setPreviewUrl({ url: data.downloadUrl, item });
+    } catch {
+      setErrorMsg("Erro de conexão ao buscar o arquivo.");
     } finally {
       setLoadingId(null);
     }
@@ -61,6 +92,31 @@ export function ColaboradorBrowser({
 
   return (
     <div className="space-y-4">
+      <div className="flex flex-wrap gap-2">
+        {CATEGORIES.map((c) => {
+          const active = category === c.key;
+          return (
+            <Link
+              key={c.key}
+              href={`/painel?categoria=${c.key}`}
+              className={`rounded-lg px-3.5 py-2 text-xs font-bold transition-colors ${
+                active
+                  ? "bg-[#0e526c] text-white"
+                  : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-100"
+              }`}
+            >
+              {c.label}
+            </Link>
+          );
+        })}
+      </div>
+
+      {errorMsg && (
+        <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
+          {errorMsg}
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row gap-3">
         <input
           type="search"
@@ -150,9 +206,16 @@ export function ColaboradorBrowser({
               <iframe src={previewUrl.url} title={previewUrl.item.title} className="w-full h-[65vh] rounded-xl border" />
             )}
             {previewUrl.item.category === "chat" && (
-              <a href={previewUrl.url} target="_blank" rel="noopener noreferrer" className="text-sm text-[#0e526c] underline">
-                Abrir / Baixar arquivo de chat
-              </a>
+              <div className="space-y-3">
+                {previewUrl.chatContent ? (
+                  <pre className="whitespace-pre-wrap text-xs text-slate-700 font-mono bg-slate-50 p-4 rounded-xl max-h-[60vh] overflow-y-auto">
+                    {previewUrl.chatContent}
+                  </pre>
+                ) : null}
+                <a href={previewUrl.url} target="_blank" rel="noopener noreferrer" className="inline-block text-sm font-semibold text-[#0e526c] underline">
+                  Abrir / Baixar arquivo de chat
+                </a>
+              </div>
             )}
           </div>
         </div>

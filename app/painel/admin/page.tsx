@@ -5,6 +5,8 @@ import { auditLogs, files, users } from "@/db/schema";
 import { getSessionUser } from "@/lib/auth";
 import { AdminDashboard } from "@/components/painel/admin-dashboard";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminPage() {
   const user = await getSessionUser();
   if (!user) redirect("/login");

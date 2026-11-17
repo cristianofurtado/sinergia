@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import type { PainelFileItem } from "./colaborador-browser";
 
 interface AdminUserItem {
@@ -18,6 +19,15 @@ interface AuditLogItem {
   createdAt: string;
 }
 
+type UploadCategory = "video" | "chat" | "document" | "image";
+
+const CATEGORY_OPTIONS: { value: UploadCategory; label: string }[] = [
+  { value: "video", label: "Vídeos" },
+  { value: "chat", label: "Chats" },
+  { value: "document", label: "Documentos" },
+  { value: "image", label: "Imagens e GIFs" },
+];
+
 export function AdminDashboard({
   initialFiles,
   initialUsers,
@@ -27,69 +37,131 @@ export function AdminDashboard({
   initialUsers: AdminUserItem[];
   initialLogs: AuditLogItem[];
 }) {
+  const router = useRouter();
   const [files, setFiles] = useState(initialFiles);
   const [users, setUsers] = useState(initialUsers);
-  const [category, setCategory] = useState<"video" | "chat" | "document" | "image">("document");
+  const [category, setCategory] = useState<UploadCategory>("document");
+  const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState<string>("");
   const [textTitle, setTextTitle] = useState("");
   const [textBody, setTextBody] = useState("");
-  const [feedback, setFeedback] = useState("");
+  const [feedback, setFeedback] = useState<{ type: "error" | "success"; text: string } | null>(null);
 
-  async function handleFileUpload(fileList: FileList | null) {
+  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const fileList = e.target.files;
     if (!fileList || fileList.length === 0) return;
-    setFeedback("");
-    for (const file of Array.from(fileList)) {
-      setProgress(`Enviando ${file.name}...`);
-      const presignRes = await fetch("/api/files/presign", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "put",
-          category,
-          title: file.name,
-          mimeType: file.type || "application/octet-stream",
-          sizeBytes: file.size,
-          fileName: file.name,
-        }),
-      });
-      if (!presignRes.ok) {
-        const err = (await presignRes.json()) as { error?: string };
-        setFeedback(err.error ?? "Erro ao gerar URL assinada");
-        continue;
+
+    const selectedFiles = Array.from(fileList);
+    e.target.value = "";
+    setFeedback(null);
+    setIsUploading(true);
+
+    let uploadedCount = 0;
+    try {
+      for (const file of selectedFiles) {
+        setProgress(`Preparando ${file.name}...`);
+
+        const presignRes = await fetch("/api/files/presign", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "put",
+            category,
+            title: file.name,
+            mimeType: file.type || "application/octet-stream",
+            sizeBytes: file.size,
+            fileName: file.name,
+          }),
+        });
+
+        const presignData = (await presignRes.json().catch(() => ({}))) as {
+          uploadUrl?: string;
+          r2Key?: string;
+          contentType?: string;
+          error?: string;
+        };
+
+        if (!presignRes.ok || !presignData.uploadUrl || !presignData.r2Key) {
+          setFeedback({
+            type: "error",
+            text: presignData.error ?? `Erro ao gerar URL assinada para ${file.name}`,
+          });
+          continue;
+        }
+
+        setProgress(`Enviando ${file.name} para o armazenamento...`);
+        let putRes: Response;
+        try {
+          putRes = await fetch(presignData.uploadUrl, {
+            method: "PUT",
+            headers: { "Content-Type": presignData.contentType || "application/octet-stream" },
+            body: file,
+          });
+        } catch {
+          setFeedback({
+            type: "error",
+            text: `Falha de rede/CORS ao enviar ${file.name} para o R2. Verifique a política CORS do bucket.`,
+          });
+          continue;
+        }
+
+        if (!putRes.ok) {
+          setFeedback({
+            type: "error",
+            text: `O R2 recusou o envio de ${file.name} (status ${putRes.status}).`,
+          });
+          continue;
+        }
+
+        setProgress(`Confirmando ${file.name}...`);
+        const confirmRes = await fetch("/api/files/presign", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "confirm",
+            category,
+            title: file.name,
+            mimeType: presignData.contentType || file.type || "application/octet-stream",
+            sizeBytes: file.size,
+            fileName: file.name,
+            r2Key: presignData.r2Key,
+          }),
+        });
+
+        const confirmData = (await confirmRes.json().catch(() => ({}))) as { error?: string };
+        if (!confirmRes.ok) {
+          setFeedback({
+            type: "error",
+            text: confirmData.error ?? `Erro ao confirmar ${file.name} no banco.`,
+          });
+          continue;
+        }
+
+        uploadedCount += 1;
       }
-      const { uploadUrl, r2Key } = (await presignRes.json()) as { uploadUrl: string; r2Key: string };
-      const putRes = await fetch(uploadUrl, {
-        method: "PUT",
-        headers: { "Content-Type": file.type || "application/octet-stream" },
-        body: file,
-      });
-      if (!putRes.ok) {
-        setFeedback(`Falha no envio de ${file.name} para o R2`);
-        continue;
+
+      if (uploadedCount > 0) {
+        setFeedback({
+          type: "success",
+          text: `${uploadedCount} arquivo(s) importado(s)! Redirecionando...`,
+        });
+        router.push(`/painel?categoria=${category}`);
+        router.refresh();
       }
-      const confirmRes = await fetch("/api/files/presign", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "confirm",
-          category,
-          title: file.name,
-          mimeType: file.type || "application/octet-stream",
-          sizeBytes: file.size,
-          fileName: file.name,
-          r2Key,
-        }),
+    } catch (err) {
+      setFeedback({
+        type: "error",
+        text: err instanceof Error ? err.message : "Erro inesperado durante o envio.",
       });
-      if (confirmRes.ok) {
-        setFeedback(`Arquivo ${file.name} salvo com sucesso.`);
-      }
+    } finally {
+      setIsUploading(false);
+      setProgress("");
     }
-    setProgress("");
-    window.location.reload();
   }
 
   async function handleCreateText(e: React.FormEvent) {
     e.preventDefault();
+    setFeedback(null);
     const res = await fetch("/api/admin/files", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -98,7 +170,11 @@ export function AdminDashboard({
     if (res.ok) {
       setTextTitle("");
       setTextBody("");
-      window.location.reload();
+      router.push("/painel?categoria=text");
+      router.refresh();
+    } else {
+      const err = (await res.json().catch(() => ({}))) as { error?: string };
+      setFeedback({ type: "error", text: err.error ?? "Erro ao salvar texto" });
     }
   }
 
@@ -119,40 +195,78 @@ export function AdminDashboard({
     if (res.ok) {
       setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, role } : u)));
     } else {
-      const err = (await res.json()) as { error?: string };
-      setFeedback(err.error ?? "Erro ao atualizar papel");
+      const err = (await res.json().catch(() => ({}))) as { error?: string };
+      setFeedback({ type: "error", text: err.error ?? "Erro ao atualizar papel" });
     }
   }
 
   return (
     <div className="space-y-8">
       {feedback && (
-        <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-900">
-          {feedback}
+        <div
+          role={feedback.type === "error" ? "alert" : "status"}
+          className={`rounded-xl border px-4 py-3 text-sm font-medium ${
+            feedback.type === "error"
+              ? "bg-red-50 border-red-200 text-red-900"
+              : "bg-emerald-50 border-emerald-200 text-emerald-900"
+          }`}
+        >
+          {feedback.text}
         </div>
       )}
 
       {/* Upload direto ao R2 */}
       <section className="rounded-2xl border border-slate-200 bg-white p-6 space-y-4">
         <h2 className="text-lg font-bold text-[#0e526c]">Upload de Arquivos (R2)</h2>
+
+        {/* Botões rápidos de destino */}
+        <div className="flex flex-wrap gap-2">
+          {CATEGORY_OPTIONS.map((opt) => {
+            const active = category === opt.value;
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                disabled={isUploading}
+                onClick={() => setCategory(opt.value)}
+                className={`rounded-lg px-3.5 py-2 text-xs font-bold transition-colors ${
+                  active
+                    ? "bg-[#0e526c] text-white"
+                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                }`}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
+
         <div className="flex flex-wrap gap-3 items-center">
           <select
+            aria-label="Categoria do arquivo"
+            disabled={isUploading}
             value={category}
-            onChange={(e) => setCategory(e.target.value as typeof category)}
+            onChange={(e) => setCategory(e.target.value as UploadCategory)}
             className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
           >
-            <option value="video">Vídeos</option>
-            <option value="chat">Chats</option>
-            <option value="document">Documentos</option>
-            <option value="image">Imagens e GIFs</option>
+            {CATEGORY_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
           </select>
           <input
             type="file"
             multiple
-            onChange={(e) => handleFileUpload(e.target.files)}
-            className="text-sm"
+            disabled={isUploading}
+            onChange={handleFileUpload}
+            className="text-sm disabled:opacity-50"
           />
-          {progress && <span className="text-xs font-semibold text-[#0e526c]">{progress}</span>}
+          {progress && (
+            <span className="text-xs font-semibold text-[#0e526c] animate-pulse">
+              {progress}
+            </span>
+          )}
         </div>
       </section>
 

@@ -28,7 +28,6 @@ function getR2Client(): S3Client {
 export async function createPresignedUploadUrl(params: {
   key: string;
   contentType: string;
-  contentLength: number;
   expiresInSeconds?: number;
 }): Promise<string> {
   const bucket = getRequiredEnv("R2_BUCKET");
@@ -36,7 +35,6 @@ export async function createPresignedUploadUrl(params: {
     Bucket: bucket,
     Key: params.key,
     ContentType: params.contentType,
-    ContentLength: params.contentLength,
   });
   return getSignedUrl(getR2Client(), cmd, {
     expiresIn: params.expiresInSeconds ?? 300,
