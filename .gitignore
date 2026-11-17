@@ -5,6 +5,9 @@
 
 # Build de produção
 /.next/
+/.open-next/
+/.wrangler/
+/test-results/
 /out/
 /build
 dist

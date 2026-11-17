@@ -1,0 +1,13 @@
+[
+  {
+    "AllowedOrigins": [
+      "https://energiaprospectar.com.br",
+      "https://www.energiaprospectar.com.br",
+      "http://localhost:3000"
+    ],
+    "AllowedMethods": ["GET", "PUT", "HEAD"],
+    "AllowedHeaders": ["Content-Type"],
+    "ExposeHeaders": ["ETag"],
+    "MaxAgeSeconds": 3600
+  }
+]

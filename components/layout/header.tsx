@@ -54,6 +54,7 @@ export function Header() {
     { label: "Tabela de Descontos", href: "#tabela-descontos" },
     { label: "Assine sua Energia", href: "#assine-energia" },
     { label: "Contato", href: "#contato" },
+    { label: "Área de Login", href: "/login" },
   ];
 
   return (
