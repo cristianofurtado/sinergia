@@ -30,14 +30,14 @@ export default async function LoginPage({
     <main className="min-h-screen bg-[#0b1322] flex flex-col items-center justify-center px-4 py-10">
       <div className="w-full max-w-4xl rounded-2xl overflow-hidden border border-white/10 shadow-2xl grid grid-cols-1 md:grid-cols-2">
         {/* Coluna esquerda: marca */}
-        <div className="bg-[#111a2b] flex flex-col items-center justify-center p-10 sm:p-14 gap-6">
+        <div className="bg-gradient-to-br from-white via-slate-50 to-sky-50 flex flex-col items-center justify-center p-10 sm:p-14 gap-6">
           <Image
             src="/logo-energia-prospectar.webp"
             alt="Energia Prospectar"
             width={240}
             height={70}
             priority
-            className="w-56 sm:w-64 h-auto object-contain"
+            className="w-56 sm:w-64 h-auto object-contain drop-shadow-xs"
           />
           <span className="h-1 w-10 rounded-full bg-amber-500" aria-hidden="true" />
         </div>
