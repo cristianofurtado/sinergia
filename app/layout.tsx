@@ -7,6 +7,10 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://energiaprospectar.com.br"),
+  alternates: {
+    canonical: "./",
+  },
   title: "Energia Prospectar | Assine sua Energia, Mercado Livre & Gestão Inteligente",
   description:
     "Plataforma de gestão de Energia e ecossistema para clientes B2B e consultores em todo o Brasil. Economize de 10% a 30% na conta de luz sem obras ou investimentos.",
@@ -29,7 +33,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "pt_BR",
-    url: "https://sinergia.tech",
+    url: "/",
     title: "Energia Prospectar | Assinatura de Energia & Economia na Conta de Luz",
     description:
       "Plataforma de gestão de Energia e ecossistema para clientes B2B e consultores em todo o Brasil.",

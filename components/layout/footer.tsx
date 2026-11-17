@@ -32,9 +32,9 @@ export function Footer() {
 
           {/* Quick Navigation */}
           <div className="space-y-2.5">
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+            <p className="text-xs font-bold text-white uppercase tracking-wider">
               Navegação
-            </h4>
+            </p>
             <ul className="space-y-2 text-xs sm:text-sm">
               <li>
                 <a href="#inicio" className="text-slate-300 hover:text-white transition-colors">
@@ -66,9 +66,9 @@ export function Footer() {
 
           {/* Consultores Regionais */}
           <div className="space-y-2.5">
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+            <p className="text-xs font-bold text-white uppercase tracking-wider">
               Especialistas em Energia
-            </h4>
+            </p>
             <ul className="space-y-2 text-xs text-slate-300">
               <li>
                 <strong className="text-white block font-semibold">Cristiano Furtado</strong>
@@ -105,9 +105,9 @@ export function Footer() {
 
           {/* Institutional Contact */}
           <div className="space-y-2.5">
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+            <p className="text-xs font-bold text-white uppercase tracking-wider">
               Canais Oficiais
-            </h4>
+            </p>
             <ul className="space-y-2 text-xs text-slate-300">
               <li className="flex items-start gap-2">
                 <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />

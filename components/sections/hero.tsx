@@ -129,9 +129,9 @@ export function Hero() {
 
                   {/* Screen Title */}
                   <div className="space-y-0.5 pt-1.5 pb-2">
-                    <h3 className="text-base sm:text-lg font-black text-slate-900 leading-tight">
+                    <h2 className="text-base sm:text-lg font-black text-slate-900 leading-tight">
                       Sua economia na fatura
-                    </h3>
+                    </h2>
                     <p className="text-[10px] sm:text-[11px] text-slate-500 font-medium">
                       Confira o resultado deste mês
                     </p>

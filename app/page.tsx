@@ -6,10 +6,49 @@ import { HowItWorks } from "@/components/sections/how-it-works";
 import { Simulator } from "@/components/sections/simulator";
 import { Ecosystem } from "@/components/sections/ecosystem";
 import { Contact } from "@/components/sections/contact";
+import { SITE_INFO, STATES_COVERAGE } from "@/lib/site-content";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      name: SITE_INFO.name,
+      url: SITE_INFO.url,
+      logo: SITE_INFO.logo,
+      description: SITE_INFO.description,
+      contactPoint: {
+        "@type": "ContactPoint",
+        telephone: `+${SITE_INFO.primaryPhoneRaw}`,
+        contactType: "customer service",
+        availableLanguage: ["Portuguese"],
+      },
+      knowsAbout: SITE_INFO.knowsAbout,
+    },
+    {
+      "@type": "Service",
+      name: "Energia por Assinatura e Mercado Livre de Energia",
+      serviceType: "Gestão de Energia e Geração Distribuída",
+      provider: {
+        "@type": "Organization",
+        name: SITE_INFO.name,
+        url: SITE_INFO.url,
+      },
+      areaServed: STATES_COVERAGE.map((s) => ({
+        "@type": "State",
+        name: s.name,
+      })),
+    },
+  ],
+};
 
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col bg-slate-50 text-slate-900 selection:bg-amber-100 selection:text-amber-900">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Header />
       <main className="flex-1">
         <Hero />
