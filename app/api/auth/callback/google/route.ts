@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
   try {
     const clientId = getRequiredEnv("GOOGLE_CLIENT_ID");
     const clientSecret = getRequiredEnv("GOOGLE_CLIENT_SECRET");
-    const redirectUri = `${origin}/api/auth/google/callback`;
+    const redirectUri = `${origin}/api/auth/callback/google`;
 
     const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
@@ -157,7 +157,7 @@ export async function GET(request: NextRequest) {
     });
     return response;
   } catch (err) {
-    console.error("[auth/google/callback] erro:", err instanceof Error ? err.message : err);
+    console.error("[auth/callback/google] erro:", err instanceof Error ? err.message : err);
     return NextResponse.redirect(new URL("/login?error=internal", origin));
   }
 }

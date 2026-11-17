@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   try {
     const clientId = getRequiredEnv("GOOGLE_CLIENT_ID");
     const origin = request.nextUrl.origin;
-    const redirectUri = `${origin}/api/auth/google/callback`;
+    const redirectUri = `${origin}/api/auth/callback/google`;
 
     const state = crypto.randomBytes(24).toString("base64url");
     const codeVerifier = crypto.randomBytes(32).toString("base64url");
