@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { getDb } from "@/db";
 import { files } from "@/db/schema";
 import { getSessionUser, logAudit } from "@/lib/auth";
+import { inferCategoryFromUrl, parseSafeExternalUrl } from "@/lib/external-links";
 import type { FileCategory } from "@/lib/file-validation";
 import { deleteR2Object } from "@/lib/r2";
 
@@ -12,9 +13,55 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
   if (user.role !== "admin") return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
 
-  const body = (await request.json()) as { title?: string; textBody?: string };
+  const body = (await request.json()) as {
+    title?: string;
+    textBody?: string;
+    linkUrl?: string;
+    category?: "auto" | "video" | "document" | "image";
+  };
+
+  const rawLink = body.linkUrl?.trim();
   const title = body.title?.trim();
   const textBody = body.textBody?.trim();
+
+  if (rawLink) {
+    const safeUrl = parseSafeExternalUrl(rawLink);
+    if (!safeUrl) {
+      return NextResponse.json({ error: "Link inválido. Use http:// ou https://." }, { status: 400 });
+    }
+    const category: "video" | "document" | "image" =
+      body.category && body.category !== "auto"
+        ? body.category
+        : inferCategoryFromUrl(safeUrl.toString());
+    const finalTitle = title || safeUrl.hostname + (safeUrl.pathname !== "/" ? safeUrl.pathname.slice(0, 50) : "");
+
+    const db = getDb();
+    const id = crypto.randomUUID();
+    const nowIso = new Date().toISOString();
+    await db.insert(files).values({
+      id,
+      category,
+      title: finalTitle,
+      originalName: safeUrl.toString(),
+      r2Key: null,
+      mimeType: `${category}/external-url`,
+      sizeBytes: 0,
+      textBody: textBody || null,
+      uploadedBy: user.id,
+      createdAt: nowIso,
+      updatedAt: nowIso,
+    });
+
+    await logAudit({
+      actorId: user.id,
+      action: "upload",
+      targetType: "file",
+      targetId: id,
+      metadata: { category, title: finalTitle, externalUrl: safeUrl.toString() },
+    });
+    return NextResponse.json({ id, category }, { status: 201 });
+  }
+
   if (!title || !textBody) {
     return NextResponse.json({ error: "Título e conteúdo são obrigatórios" }, { status: 400 });
   }

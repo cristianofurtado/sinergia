@@ -14,7 +14,9 @@ import {
   FolderPlus,
   Send,
   Paperclip,
+  Link2,
 } from "lucide-react";
+import { inferCategoryFromUrl, parseSafeExternalUrl } from "@/lib/external-links";
 import { inferCategoryFromMime, resolveMimeType } from "@/lib/file-validation";
 import type { PainelFileItem } from "./colaborador-browser";
 
@@ -82,6 +84,7 @@ export function AdminDashboard({
   const [postTitle, setPostTitle] = useState("");
   const [postText, setPostText] = useState("");
   const [textPreview, setTextPreview] = useState(false);
+  const [externalLinksInput, setExternalLinksInput] = useState("");
   const [queuedFiles, setQueuedFiles] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
@@ -94,6 +97,20 @@ export function AdminDashboard({
   const [filterCat, setFilterCat] = useState<string>("all");
 
   const [feedback, setFeedback] = useState<{ type: "error" | "success"; text: string } | null>(null);
+
+  const parsedLinks = useMemo(() => {
+    return externalLinksInput
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((raw) => {
+        const url = parseSafeExternalUrl(raw);
+        if (!url) return { raw, valid: false as const, detected: null };
+        const detected =
+          category === "auto" ? inferCategoryFromUrl(url.toString()) : category;
+        return { raw: url.toString(), valid: true as const, detected };
+      });
+  }, [externalLinksInput, category]);
 
   const visibleFiles = useMemo(() => {
     if (filterCat === "all") return files;
@@ -116,11 +133,21 @@ export function AdminDashboard({
 
     const cleanTitle = postTitle.trim();
     const cleanText = postText.trim();
+    const validLinks = parsedLinks.filter((l) => l.valid);
+    const invalidLinks = parsedLinks.filter((l) => !l.valid);
 
-    if (queuedFiles.length === 0 && !cleanText) {
+    if (invalidLinks.length > 0) {
       setFeedback({
         type: "error",
-        text: "Escreva um texto ou anexe pelo menos um arquivo antes de publicar.",
+        text: `Link inválido: "${invalidLinks[0].raw}". Use URLs completas com https:// ou http://.`,
+      });
+      return;
+    }
+
+    if (queuedFiles.length === 0 && validLinks.length === 0 && !cleanText) {
+      setFeedback({
+        type: "error",
+        text: "Escreva um texto, cole um link ou anexe pelo menos um arquivo antes de publicar.",
       });
       return;
     }
@@ -129,8 +156,8 @@ export function AdminDashboard({
     setIsPublishing(true);
 
     try {
-      // Caso 1: apenas texto (sem anexos)
-      if (queuedFiles.length === 0) {
+      // Caso 1: apenas texto (sem anexos e sem links)
+      if (queuedFiles.length === 0 && validLinks.length === 0) {
         setProgress("Publicando mensagem de texto...");
         const derivedTitle = cleanTitle || cleanText.split("\n")[0].slice(0, 80);
         const res = await fetch("/api/admin/files", {
@@ -151,7 +178,30 @@ export function AdminDashboard({
         return;
       }
 
-      // Caso 2: 1 ou mais arquivos (com ou sem legenda/texto junto)
+      // Caso 2: Links externos colados (vídeos, fotos ou documentos)
+      let publishedCount = 0;
+      for (let i = 0; i < validLinks.length; i++) {
+        const link = validLinks[i];
+        setProgress(`[${i + 1}/${validLinks.length}] Salvando link externo...`);
+        const res = await fetch("/api/admin/files", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            linkUrl: link.raw,
+            category,
+            title: validLinks.length === 1 && queuedFiles.length === 0 ? cleanTitle : undefined,
+            textBody: i === 0 && queuedFiles.length === 0 ? cleanText : undefined,
+          }),
+        });
+        if (!res.ok) {
+          const err = (await res.json().catch(() => ({}))) as { error?: string };
+          setFeedback({ type: "error", text: err.error ?? `Erro ao salvar link ${link.raw}` });
+          continue;
+        }
+        publishedCount += 1;
+      }
+
+      // Caso 3: 1 ou mais arquivos no R2 (com ou sem legenda/texto junto)
       let uploadedCount = 0;
       for (let i = 0; i < queuedFiles.length; i++) {
         const file = queuedFiles[i];
@@ -242,13 +292,14 @@ export function AdminDashboard({
         uploadedCount += 1;
       }
 
-      if (uploadedCount > 0) {
+      if (uploadedCount + publishedCount > 0) {
         setPostTitle("");
         setPostText("");
+        setExternalLinksInput("");
         setQueuedFiles([]);
         setFeedback({
           type: "success",
-          text: `${uploadedCount} item(ns) publicado(s) no Chat Colaboradores!`,
+          text: `${uploadedCount + publishedCount} item(ns) publicado(s) no Chat Colaboradores!`,
         });
         router.push("/painel");
         router.refresh();
@@ -497,6 +548,49 @@ export function AdminDashboard({
                   />
                 </label>
 
+                <div className="space-y-1.5">
+                  <label
+                    htmlFor="external-links"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700"
+                  >
+                    <Link2 className="w-3.5 h-3.5 text-[#0e526c]" />
+                    <span>Colar links de vídeos, fotos ou documentos (opcional, 1 por linha)</span>
+                  </label>
+                  <textarea
+                    id="external-links"
+                    rows={2}
+                    disabled={isPublishing}
+                    value={externalLinksInput}
+                    onChange={(e) => setExternalLinksInput(e.target.value)}
+                    placeholder="https://www.youtube.com/watch?v=... ou link direto de foto/PDF/Drive"
+                    className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#0e526c]"
+                  />
+                  {parsedLinks.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {parsedLinks.map((l, idx) => (
+                        <span
+                          key={idx}
+                          className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
+                            l.valid
+                              ? "bg-sky-50 text-[#0e526c] border border-sky-200"
+                              : "bg-red-50 text-red-700 border border-red-200"
+                          }`}
+                        >
+                          {l.valid
+                            ? `Link ${idx + 1}: ${
+                                l.detected === "video"
+                                  ? "Vídeo"
+                                  : l.detected === "image"
+                                    ? "Foto / GIF"
+                                    : "Documento"
+                              }`
+                            : `Link ${idx + 1}: URL inválida`}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
                 {queuedFiles.length > 0 && (
                   <ul className="space-y-1.5 max-h-32 overflow-y-auto">
                     {queuedFiles.map((file, idx) => (
@@ -530,18 +624,21 @@ export function AdminDashboard({
             <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100">
               <span className="text-xs font-semibold text-[#0e526c]">
                 {progress ||
-                  (queuedFiles.length > 0 && postText.trim()
-                    ? `Pronto para publicar ${queuedFiles.length} arquivo(s) com legenda.`
-                    : queuedFiles.length > 0
-                      ? `Pronto para publicar ${queuedFiles.length} arquivo(s).`
-                      : postText.trim()
-                        ? "Pronto para publicar mensagem de texto."
-                        : "Anexe arquivo(s) e/ou escreva um texto para publicar.")}
+                  (queuedFiles.length + parsedLinks.filter((l) => l.valid).length > 0
+                    ? `Pronto para publicar ${queuedFiles.length} arquivo(s) e ${parsedLinks.filter((l) => l.valid).length} link(s).`
+                    : postText.trim()
+                      ? "Pronto para publicar mensagem de texto."
+                      : "Escreva um texto, cole links ou anexe arquivos para publicar.")}
               </span>
 
               <button
                 type="submit"
-                disabled={isPublishing || (queuedFiles.length === 0 && !postText.trim())}
+                disabled={
+                  isPublishing ||
+                  (queuedFiles.length === 0 &&
+                    parsedLinks.filter((l) => l.valid).length === 0 &&
+                    !postText.trim())
+                }
                 className="inline-flex items-center gap-2 rounded-xl bg-[#0e526c] px-6 py-2.5 text-sm font-bold text-white hover:bg-[#0b4156] disabled:opacity-40 transition-colors"
               >
                 <Send className="w-4 h-4" />

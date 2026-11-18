@@ -21,7 +21,9 @@ import {
   Play,
   ChevronLeft,
   ChevronRight,
+  ExternalLink,
 } from "lucide-react";
+import { getExternalVideoEmbed } from "@/lib/external-links";
 import { inferCategoryFromMime, resolveMimeType } from "@/lib/file-validation";
 
 export interface ChatFeedItem {
@@ -112,6 +114,10 @@ export function ChatColaboradores({
 
   async function handleDownload(item: ChatFeedItem) {
     setErrorMsg(null);
+    if (item.mimeType.endsWith("/external-url") && item.mediaUrl) {
+      window.open(item.mediaUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
     const res = await fetch("/api/files/presign", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -389,18 +395,67 @@ export function ChatColaboradores({
             <div className="lg:col-span-2 bg-white rounded-2xl p-4 shadow-xs border border-black/5 space-y-3">
               {currentVideo?.mediaUrl && (
                 <>
-                  <video
-                    key={currentVideo.id}
-                    controls
-                    autoPlay={false}
-                    src={currentVideo.mediaUrl}
-                    onEnded={() => {
-                      if (activeVideoIndex < visibleItems.length - 1) {
-                        setActiveVideoIndex((i) => i + 1);
+                  {currentVideo.mimeType === "video/external-url" ? (
+                    (() => {
+                      const embed = getExternalVideoEmbed(currentVideo.mediaUrl);
+                      if (embed.type === "iframe") {
+                        return (
+                          <iframe
+                            key={currentVideo.id}
+                            src={embed.src}
+                            title={currentVideo.title}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            className="w-full aspect-video rounded-xl border border-slate-200 bg-black"
+                          />
+                        );
                       }
-                    }}
-                    className="w-full rounded-xl max-h-[60vh] bg-black"
-                  />
+                      if (embed.type === "video") {
+                        return (
+                          <video
+                            key={currentVideo.id}
+                            controls
+                            src={embed.src}
+                            onEnded={() => {
+                              if (activeVideoIndex < visibleItems.length - 1) {
+                                setActiveVideoIndex((i) => i + 1);
+                              }
+                            }}
+                            className="w-full rounded-xl max-h-[60vh] bg-black"
+                          />
+                        );
+                      }
+                      return (
+                        <div className="rounded-xl bg-slate-100 p-8 text-center space-y-3">
+                          <p className="text-sm font-semibold text-slate-700">
+                            Vídeo hospedado externamente
+                          </p>
+                          <a
+                            href={embed.src}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 rounded-xl bg-[#0e526c] px-4 py-2 text-xs font-bold text-white hover:bg-[#0b4156]"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                            Abrir vídeo externo
+                          </a>
+                        </div>
+                      );
+                    })()
+                  ) : (
+                    <video
+                      key={currentVideo.id}
+                      controls
+                      autoPlay={false}
+                      src={currentVideo.mediaUrl}
+                      onEnded={() => {
+                        if (activeVideoIndex < visibleItems.length - 1) {
+                          setActiveVideoIndex((i) => i + 1);
+                        }
+                      }}
+                      className="w-full rounded-xl max-h-[60vh] bg-black"
+                    />
+                  )}
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="text-xs font-bold text-[#0e526c]">
@@ -579,12 +634,50 @@ export function ChatColaboradores({
 
                   {item.category === "video" && item.mediaUrl && (
                     <div className="space-y-1.5">
-                      <video
-                        controls
-                        preload="metadata"
-                        src={item.mediaUrl}
-                        className="w-full max-h-80 rounded-xl bg-black"
-                      />
+                      {item.mimeType === "video/external-url" ? (
+                        (() => {
+                          const embed = getExternalVideoEmbed(item.mediaUrl);
+                          if (embed.type === "iframe") {
+                            return (
+                              <iframe
+                                src={embed.src}
+                                title={item.title}
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                                className="w-full sm:w-[420px] aspect-video rounded-xl border border-slate-200 bg-black"
+                              />
+                            );
+                          }
+                          if (embed.type === "video") {
+                            return (
+                              <video
+                                controls
+                                preload="metadata"
+                                src={embed.src}
+                                className="w-full max-h-80 rounded-xl bg-black"
+                              />
+                            );
+                          }
+                          return (
+                            <a
+                              href={embed.src}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 rounded-xl bg-[#0e526c] px-4 py-2 text-xs font-bold text-white hover:bg-[#0b4156]"
+                            >
+                              <ExternalLink className="w-4 h-4" />
+                              Abrir vídeo externo
+                            </a>
+                          );
+                        })()
+                      ) : (
+                        <video
+                          controls
+                          preload="metadata"
+                          src={item.mediaUrl}
+                          className="w-full max-h-80 rounded-xl bg-black"
+                        />
+                      )}
                       <p className="text-xs text-slate-600 break-words">{item.title}</p>
                       {item.textBody && (
                         <p className="text-sm text-slate-800 whitespace-pre-wrap leading-relaxed break-words pt-1">
@@ -604,7 +697,9 @@ export function ChatColaboradores({
                           <p className="text-xs sm:text-sm font-bold text-slate-900 truncate">
                             {item.title}
                           </p>
-                          <p className="text-[11px] text-slate-500">{sizeLabel}</p>
+                          <p className="text-[11px] text-slate-500">
+                            {item.mimeType.endsWith("/external-url") ? "Link externo" : sizeLabel}
+                          </p>
                         </div>
                         <div className="flex items-center gap-1.5 shrink-0">
                           {item.mimeType === "application/pdf" && item.mediaUrl && (
@@ -620,10 +715,14 @@ export function ChatColaboradores({
                           <button
                             type="button"
                             onClick={() => handleDownload(item)}
-                            title="Baixar"
+                            title={item.mimeType.endsWith("/external-url") ? "Abrir link" : "Baixar"}
                             className="rounded-lg border border-slate-300 bg-white p-2 text-slate-700 hover:bg-slate-100"
                           >
-                            <Download className="w-4 h-4" />
+                            {item.mimeType.endsWith("/external-url") ? (
+                              <ExternalLink className="w-4 h-4" />
+                            ) : (
+                              <Download className="w-4 h-4" />
+                            )}
                           </button>
                         </div>
                       </div>

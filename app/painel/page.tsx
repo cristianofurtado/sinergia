@@ -48,6 +48,8 @@ export default async function PainelPage() {
           forceAttachment: mustForceAttachment(row.mimeType),
           expiresInSeconds: 3600,
         }).catch(() => null);
+      } else if (!row.r2Key && row.mimeType.endsWith("/external-url")) {
+        mediaUrl = row.originalName;
       }
       return {
         id: row.id,
