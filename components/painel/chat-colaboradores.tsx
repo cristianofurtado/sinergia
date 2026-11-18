@@ -355,7 +355,7 @@ export function ChatColaboradores({
     }
   }
 
-  function renderVideoPlayer(item: ChatFeedItem, onEnded?: () => void) {
+  function renderVideoPlayer(item: ChatFeedItem, onEnded?: () => void, inPlaylist = false) {
     if (!item.mediaUrl) return null;
     const isExt = item.mimeType.endsWith("/external-url");
     if (isExt) {
@@ -368,7 +368,11 @@ export function ChatColaboradores({
             title={item.title}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
-            className="w-full aspect-video rounded-xl border border-slate-200 bg-black"
+            className={
+              inPlaylist
+                ? "w-full aspect-video rounded-xl border border-slate-200 bg-black"
+                : "w-[82vw] sm:w-[440px] aspect-video rounded-xl border border-slate-200 bg-black block"
+            }
           />
         );
       }
@@ -380,12 +384,16 @@ export function ChatColaboradores({
             preload="metadata"
             src={embed.src}
             onEnded={onEnded}
-            className="w-full max-h-96 rounded-xl bg-black"
+            className={
+              inPlaylist
+                ? "w-full max-h-[60vh] rounded-xl bg-black"
+                : "w-full max-w-[440px] max-h-[340px] rounded-xl bg-black block"
+            }
           />
         );
       }
       return (
-        <div className="rounded-xl bg-slate-900 text-white p-5 space-y-3">
+        <div className="rounded-xl bg-slate-900 text-white p-4 space-y-2">
           <a
             href={embed.src}
             target="_blank"
@@ -406,7 +414,11 @@ export function ChatColaboradores({
         preload="metadata"
         src={item.mediaUrl}
         onEnded={onEnded}
-        className="w-full max-h-96 rounded-xl bg-black"
+        className={
+          inPlaylist
+            ? "w-full max-h-[60vh] rounded-xl bg-black"
+            : "w-full max-w-[440px] max-h-[340px] rounded-xl bg-black block"
+        }
       />
     );
   }
@@ -547,11 +559,15 @@ export function ChatColaboradores({
             <div className="lg:col-span-2 bg-white rounded-2xl p-4 shadow-xs border border-black/5 space-y-3">
               {currentVideo && (
                 <>
-                  {renderVideoPlayer(currentVideo, () => {
-                    if (activeVideoIndex < visibleItems.length - 1) {
-                      setActiveVideoIndex((i) => i + 1);
-                    }
-                  })}
+                  {renderVideoPlayer(
+                    currentVideo,
+                    () => {
+                      if (activeVideoIndex < visibleItems.length - 1) {
+                        setActiveVideoIndex((i) => i + 1);
+                      }
+                    },
+                    true
+                  )}
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="text-xs font-bold text-[#0e526c]">
@@ -685,9 +701,32 @@ export function ChatColaboradores({
                 : `${Math.max(1, Math.round(item.sizeBytes / 1024))} KB`;
             const isEditingThis = editingItemId === item.id;
 
+            const docEmbedUrl =
+              (item.category === "document" || item.category === "chat") && item.mediaUrl
+                ? item.mimeType === "application/pdf"
+                  ? item.mediaUrl
+                  : isExternal
+                    ? getExternalDocumentEmbed(item.mediaUrl)
+                    : null
+                : null;
+
+            const cardSizeClass = isEditingThis
+              ? "w-full max-w-md"
+              : item.category === "image"
+                ? "w-fit max-w-[88vw] sm:max-w-[320px]"
+                : item.category === "video"
+                  ? "w-fit max-w-[92vw] sm:max-w-[468px]"
+                  : docEmbedUrl
+                    ? "w-[90vw] sm:w-[420px]"
+                    : item.category === "document" || item.category === "chat"
+                      ? "w-fit min-w-[250px] max-w-[90vw] sm:max-w-[380px]"
+                      : "w-fit min-w-[180px] max-w-[90vw] sm:max-w-[480px]";
+
             return (
               <div key={item.id} className="flex justify-start">
-                <article className="w-full max-w-[95%] sm:max-w-[80%] lg:max-w-[68%] bg-white rounded-2xl rounded-tl-xs px-4 py-3.5 shadow-xs border border-black/5 space-y-2.5 relative group">
+                <article
+                  className={`${cardSizeClass} bg-white rounded-2xl rounded-tl-xs px-3.5 py-3 shadow-xs border border-black/5 space-y-2 relative group`}
+                >
                   <div className="flex items-center justify-between gap-4">
                     <span className="text-xs font-extrabold text-[#0e526c]">
                       {activeFilter !== "all" ? `#${idx + 1} · ` : ""}
@@ -774,7 +813,7 @@ export function ChatColaboradores({
                       )}
 
                       {item.category === "image" && item.mediaUrl && (
-                        <div className="space-y-2">
+                        <div className="space-y-1.5">
                           <button
                             type="button"
                             onClick={() =>
@@ -783,13 +822,13 @@ export function ChatColaboradores({
                                 url: getExternalImageSrc(item.mediaUrl!),
                               })
                             }
-                            className="block rounded-xl overflow-hidden bg-slate-100"
+                            className="block rounded-xl overflow-hidden bg-slate-50"
                           >
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                               src={getExternalImageSrc(item.mediaUrl)}
                               alt={item.title}
-                              className="max-h-96 w-auto rounded-xl object-contain"
+                              className="max-h-[380px] w-auto max-w-full rounded-xl object-contain block"
                             />
                           </button>
                           {item.textBody && (
@@ -801,7 +840,7 @@ export function ChatColaboradores({
                       )}
 
                       {item.category === "video" && item.mediaUrl && (
-                        <div className="space-y-2">
+                        <div className="space-y-1.5">
                           {renderVideoPlayer(item)}
                           {item.textBody && (
                             <p className="text-sm text-slate-800 whitespace-pre-wrap leading-relaxed break-words">
@@ -812,22 +851,14 @@ export function ChatColaboradores({
                       )}
 
                       {(item.category === "document" || item.category === "chat") && (
-                        <div className="space-y-2.5">
-                          {/* Visualização direta dentro do chat para PDF ou documento externo (Drive/Docs/etc.) */}
-                          {item.mediaUrl &&
-                            (item.mimeType === "application/pdf" || isExternal) &&
-                            (() => {
-                              const embedUrl = isExternal
-                                ? getExternalDocumentEmbed(item.mediaUrl)
-                                : item.mediaUrl;
-                              return embedUrl ? (
-                                <iframe
-                                  src={embedUrl}
-                                  title={item.title}
-                                  className="w-full h-72 sm:h-80 rounded-xl border border-slate-200 bg-slate-50"
-                                />
-                              ) : null;
-                            })()}
+                        <div className="space-y-2">
+                          {docEmbedUrl && (
+                            <iframe
+                              src={docEmbedUrl}
+                              title={item.title}
+                              className="w-full h-64 sm:h-72 rounded-xl border border-slate-200 bg-slate-50 block"
+                            />
+                          )}
 
                           <div className="flex items-center gap-3 rounded-xl bg-slate-50 border border-slate-200/80 p-3">
                             <div className="w-10 h-10 rounded-lg bg-[#0e526c]/10 text-[#0e526c] flex items-center justify-center shrink-0">
@@ -840,15 +871,13 @@ export function ChatColaboradores({
                               <p className="text-[11px] text-slate-500">{sizeLabel}</p>
                             </div>
                             <div className="flex items-center gap-1.5 shrink-0">
-                              {item.mediaUrl && (item.mimeType === "application/pdf" || isExternal) && (
+                              {docEmbedUrl && (
                                 <button
                                   type="button"
                                   onClick={() =>
                                     setLightbox({
                                       item,
-                                      url: isExternal
-                                        ? getExternalDocumentEmbed(item.mediaUrl!) ?? item.mediaUrl!
-                                        : item.mediaUrl!,
+                                      url: docEmbedUrl,
                                     })
                                   }
                                   title="Ampliar dentro do Chat"
@@ -864,7 +893,7 @@ export function ChatColaboradores({
                                 className="rounded-lg border border-slate-300 bg-white p-2 text-slate-700 hover:bg-slate-100"
                               >
                                 {isExternal ? (
-                                  <Eye className="w-4 h-4" />
+                                  <ExternalLink className="w-4 h-4" />
                                 ) : (
                                   <Download className="w-4 h-4" />
                                 )}

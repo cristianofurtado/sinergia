@@ -183,7 +183,7 @@ export function getExternalVideoEmbed(rawUrl: string): {
 
 export function getExternalDocumentEmbed(rawUrl: string): string | null {
   const trimmed = rawUrl.trim();
-  if (trimmed.startsWith("/")) return trimmed;
+  if (trimmed.startsWith("/")) return null;
 
   const url = parseSafeExternalUrl(trimmed);
   if (!url) return null;
@@ -201,7 +201,11 @@ export function getExternalDocumentEmbed(rawUrl: string): string | null {
     return `https://drive.google.com/file/d/${driveId}/preview`;
   }
 
-  return url.toString();
+  if (/\.pdf(\?|#|$)/i.test(url.pathname)) {
+    return url.toString();
+  }
+
+  return null;
 }
 
 export function getExternalImageSrc(rawUrl: string): string {
