@@ -56,7 +56,9 @@ export async function POST(request: NextRequest) {
       mimeType = meta.mimeType;
     }
 
-    const finalTitle = title || safeUrl.hostname + (safeUrl.pathname !== "/" ? safeUrl.pathname.slice(0, 50) : "");
+    const defaultTitle =
+      category === "video" ? "Vídeo compartilhado" : category === "image" ? "Imagem compartilhada" : "Documento compartilhado";
+    const finalTitle = title || defaultTitle;
 
     const db = getDb();
     const id = crypto.randomUUID();
