@@ -479,9 +479,7 @@ export function ChatColaboradores({
                         Vídeo #{activeVideoIndex + 1} de {visibleItems.length} · {currentVideo.authorName}
                       </p>
                       <h2 className="text-base font-extrabold text-slate-900 break-words">
-                        {currentVideo.title.startsWith("http") || currentVideo.title.includes("gamesnolinux")
-                          ? "Vídeo compartilhado"
-                          : currentVideo.title}
+                        {currentVideo.title}
                       </h2>
                       {currentVideo.textBody && (
                         <p className="text-sm text-slate-700 whitespace-pre-wrap mt-1">
@@ -526,11 +524,7 @@ export function ChatColaboradores({
                           {playing ? <Play className="w-3.5 h-3.5 fill-current" /> : `#${idx + 1}`}
                         </span>
                         <div className="min-w-0 flex-1">
-                          <p className="text-xs font-bold truncate">
-                            {vid.title.startsWith("http") || vid.title.includes("gamesnolinux")
-                              ? `Vídeo #${idx + 1}`
-                              : vid.title}
-                          </p>
+                          <p className="text-xs font-bold truncate">{vid.title}</p>
                           <p className={`text-[10px] ${playing ? "text-sky-200" : "text-slate-500"}`}>
                             {new Date(vid.createdAt).toLocaleDateString("pt-BR")} · {vid.authorName}
                           </p>
@@ -703,14 +697,7 @@ export function ChatColaboradores({
                           className="w-full sm:w-[460px] max-w-full max-h-80 rounded-xl bg-black shadow-xs"
                         />
                       )}
-                      {/* Se o título for idêntico a uma URL ou foi gravado como domínio, oculta ou exibe título limpo */}
-                      {(() => {
-                        const isRawUrl = item.title.startsWith("http://") || item.title.startsWith("https://") || item.title.includes("gamesnolinux.com.br") || (item.mimeType === "video/external-url" && item.title.includes("/"));
-                        if (isRawUrl) return null;
-                        return (
-                          <p className="text-xs font-medium text-slate-700 break-words">{item.title}</p>
-                        );
-                      })()}
+                      <p className="text-xs font-medium text-slate-700 break-words">{item.title}</p>
                       {item.textBody && (
                         <p className="text-sm text-slate-800 whitespace-pre-wrap leading-relaxed break-words pt-0.5">
                           {item.textBody}

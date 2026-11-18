@@ -49,19 +49,7 @@ export default async function PainelPage() {
           expiresInSeconds: 3600,
         }).catch(() => null);
       } else if (!row.r2Key && row.mimeType.endsWith("/external-url")) {
-        // Se for um link de arquivo/vídeo direto de host externo (que não seja embed do youtube/vimeo),
-        // mascara através do nosso endpoint de proxy interno para não vazar a origem.
-        const isEmbedHost =
-          row.originalName.includes("youtube.com") ||
-          row.originalName.includes("youtu.be") ||
-          row.originalName.includes("vimeo.com") ||
-          row.originalName.includes("loom.com");
-
-        if (row.category === "video" && !isEmbedHost) {
-          mediaUrl = `/api/media/stream?id=${encodeURIComponent(row.id)}`;
-        } else {
-          mediaUrl = row.originalName;
-        }
+        mediaUrl = row.originalName;
       }
       return {
         id: row.id,
