@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { getDb } from "@/db";
 import { files } from "@/db/schema";
 import { getSessionUser, logAudit } from "@/lib/auth";
-import { inferCategoryFromUrl, parseSafeExternalUrl } from "@/lib/external-links";
+import { extractUrlFromText, inferCategoryFromUrl, parseSafeExternalUrl } from "@/lib/external-links";
 import type { FileCategory } from "@/lib/file-validation";
 import { deleteR2Object } from "@/lib/r2";
 
@@ -20,9 +20,18 @@ export async function POST(request: NextRequest) {
     category?: "auto" | "video" | "document" | "image";
   };
 
-  const rawLink = body.linkUrl?.trim();
+  let rawLink = body.linkUrl?.trim();
   const title = body.title?.trim();
-  const textBody = body.textBody?.trim();
+  let textBody = body.textBody?.trim();
+
+  // Detecção inteligente: se não foi passado link explícito mas o texto contém uma URL
+  if (!rawLink && textBody) {
+    const extracted = extractUrlFromText(textBody);
+    if (extracted) {
+      rawLink = extracted.url;
+      textBody = extracted.cleanText || textBody;
+    }
+  }
 
   if (rawLink) {
     const safeUrl = parseSafeExternalUrl(rawLink);

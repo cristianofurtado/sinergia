@@ -23,7 +23,7 @@ import {
   ChevronRight,
   ExternalLink,
 } from "lucide-react";
-import { getExternalVideoEmbed } from "@/lib/external-links";
+import { extractUrlFromText, getExternalVideoEmbed } from "@/lib/external-links";
 import { inferCategoryFromMime, resolveMimeType } from "@/lib/file-validation";
 
 export interface ChatFeedItem {
@@ -138,11 +138,28 @@ export function ChatColaboradores({
     setErrorMsg(null);
     setIsSending(true);
     try {
-      const firstLine = text.split("\n")[0].slice(0, 80);
+      const extracted = extractUrlFromText(text);
+      let payload: Record<string, unknown>;
+
+      if (extracted) {
+        // Link detectado de forma inteligente no chat
+        const title = extracted.cleanText
+          ? extracted.cleanText.split("\n")[0].slice(0, 80)
+          : undefined;
+        payload = {
+          linkUrl: extracted.url,
+          title,
+          textBody: extracted.cleanText || undefined,
+        };
+      } else {
+        const firstLine = text.split("\n")[0].slice(0, 80);
+        payload = { title: firstLine, textBody: text };
+      }
+
       const res = await fetch("/api/admin/files", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: firstLine, textBody: text }),
+        body: JSON.stringify(payload),
       });
       if (!res.ok) {
         const err = (await res.json().catch(() => ({}))) as { error?: string };
@@ -639,13 +656,15 @@ export function ChatColaboradores({
                           const embed = getExternalVideoEmbed(item.mediaUrl);
                           if (embed.type === "iframe") {
                             return (
-                              <iframe
-                                src={embed.src}
-                                title={item.title}
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen
-                                className="w-full sm:w-[420px] aspect-video rounded-xl border border-slate-200 bg-black"
-                              />
+                              <div className="w-full sm:w-[460px] max-w-full aspect-video rounded-xl overflow-hidden border border-slate-200 bg-black shadow-xs">
+                                <iframe
+                                  src={embed.src}
+                                  title={item.title}
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                  allowFullScreen
+                                  className="w-full h-full border-0"
+                                />
+                              </div>
                             );
                           }
                           if (embed.type === "video") {
@@ -654,7 +673,7 @@ export function ChatColaboradores({
                                 controls
                                 preload="metadata"
                                 src={embed.src}
-                                className="w-full max-h-80 rounded-xl bg-black"
+                                className="w-full sm:w-[460px] max-w-full max-h-80 rounded-xl bg-black shadow-xs"
                               />
                             );
                           }
@@ -663,7 +682,7 @@ export function ChatColaboradores({
                               href={embed.src}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 rounded-xl bg-[#0e526c] px-4 py-2 text-xs font-bold text-white hover:bg-[#0b4156]"
+                              className="inline-flex items-center gap-2 rounded-xl bg-[#0e526c] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#0b4156] shadow-xs transition-colors"
                             >
                               <ExternalLink className="w-4 h-4" />
                               Abrir vídeo externo
@@ -675,12 +694,12 @@ export function ChatColaboradores({
                           controls
                           preload="metadata"
                           src={item.mediaUrl}
-                          className="w-full max-h-80 rounded-xl bg-black"
+                          className="w-full sm:w-[460px] max-w-full max-h-80 rounded-xl bg-black shadow-xs"
                         />
                       )}
-                      <p className="text-xs text-slate-600 break-words">{item.title}</p>
+                      <p className="text-xs font-medium text-slate-700 break-words">{item.title}</p>
                       {item.textBody && (
-                        <p className="text-sm text-slate-800 whitespace-pre-wrap leading-relaxed break-words pt-1">
+                        <p className="text-sm text-slate-800 whitespace-pre-wrap leading-relaxed break-words pt-0.5">
                           {item.textBody}
                         </p>
                       )}
