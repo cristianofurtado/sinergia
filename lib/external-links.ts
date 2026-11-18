@@ -30,6 +30,54 @@ export function extractUrlFromText(text: string): { url: string; cleanText: stri
   };
 }
 
+export async function detectExternalUrlMetadata(rawUrl: string): Promise<{
+  category: ExternalLinkCategory;
+  mimeType: string;
+}> {
+  const safe = parseSafeExternalUrl(rawUrl);
+  if (!safe) return { category: "document", mimeType: "document/external-url" };
+
+  // 1. Tentar inferir imediatamente por padrões conhecidos de URL (YouTube, Vimeo, extensões)
+  const inferred = inferCategoryFromUrl(safe.toString());
+  if (inferred === "video") {
+    return { category: "video", mimeType: "video/external-url" };
+  }
+  if (inferred === "image") {
+    return { category: "image", mimeType: "image/external-url" };
+  }
+
+  // 2. Se a URL não tem extensão óbvia (ex: CDN, encurtador, s3/storage personalizado como midia.gamesnolinux.com.br/-xxx)
+  // Faz uma requisição leve com Range bytes=0-1024 para detectar o Content-Type real
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 2500);
+
+    const res = await fetch(safe.toString(), {
+      method: "GET",
+      headers: {
+        Range: "bytes=0-1024",
+        "User-Agent": "Mozilla/5.0 (compatible; SinergiaLinkInspector/1.0)",
+      },
+      signal: controller.signal,
+    }).finally(() => clearTimeout(timeout));
+
+    const ct = (res.headers.get("content-type") || "").toLowerCase().trim();
+    if (ct.startsWith("video/")) {
+      return { category: "video", mimeType: "video/external-url" };
+    }
+    if (ct.startsWith("image/")) {
+      return { category: "image", mimeType: "image/external-url" };
+    }
+    if (ct.includes("pdf") || ct.includes("application/")) {
+      return { category: "document", mimeType: "document/external-url" };
+    }
+  } catch {
+    // Fallback silencioso para document se a requisição falhar ou der timeout
+  }
+
+  return { category: "document", mimeType: "document/external-url" };
+}
+
 export function inferCategoryFromUrl(rawUrl: string): ExternalLinkCategory {
   const lower = rawUrl.trim().toLowerCase();
   if (
@@ -103,10 +151,16 @@ export function getExternalVideoEmbed(rawUrl: string): {
     }
   }
 
-  // Arquivo direto de vídeo
+  // Arquivo direto de vídeo ou stream
   if (/\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(url.pathname)) {
     return { type: "video", src: url.toString() };
   }
 
-  return { type: "link", src: url.toString() };
+  // Se a URL termina com formato de vídeo ou é servida diretamente por host de mídia
+  if (host.startsWith("midia.") || host.includes("video") || host.includes("stream")) {
+    return { type: "video", src: url.toString() };
+  }
+
+  // Fallback padrão: se foi cadastrado como vídeo externo, usar o player HTML5 com a URL direta
+  return { type: "video", src: url.toString() };
 }

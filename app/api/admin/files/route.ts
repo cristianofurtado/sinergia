@@ -4,7 +4,12 @@ import { eq } from "drizzle-orm";
 import { getDb } from "@/db";
 import { files } from "@/db/schema";
 import { getSessionUser, logAudit } from "@/lib/auth";
-import { extractUrlFromText, inferCategoryFromUrl, parseSafeExternalUrl } from "@/lib/external-links";
+import {
+  detectExternalUrlMetadata,
+  extractUrlFromText,
+  inferCategoryFromUrl,
+  parseSafeExternalUrl,
+} from "@/lib/external-links";
 import type { FileCategory } from "@/lib/file-validation";
 import { deleteR2Object } from "@/lib/r2";
 
@@ -38,10 +43,19 @@ export async function POST(request: NextRequest) {
     if (!safeUrl) {
       return NextResponse.json({ error: "Link inválido. Use http:// ou https://." }, { status: 400 });
     }
-    const category: "video" | "document" | "image" =
-      body.category && body.category !== "auto"
-        ? body.category
-        : inferCategoryFromUrl(safeUrl.toString());
+
+    let category: "video" | "document" | "image";
+    let mimeType: string;
+
+    if (body.category && body.category !== "auto") {
+      category = body.category;
+      mimeType = `${category}/external-url`;
+    } else {
+      const meta = await detectExternalUrlMetadata(safeUrl.toString());
+      category = meta.category;
+      mimeType = meta.mimeType;
+    }
+
     const finalTitle = title || safeUrl.hostname + (safeUrl.pathname !== "/" ? safeUrl.pathname.slice(0, 50) : "");
 
     const db = getDb();
@@ -53,7 +67,7 @@ export async function POST(request: NextRequest) {
       title: finalTitle,
       originalName: safeUrl.toString(),
       r2Key: null,
-      mimeType: `${category}/external-url`,
+      mimeType,
       sizeBytes: 0,
       textBody: textBody || null,
       uploadedBy: user.id,
