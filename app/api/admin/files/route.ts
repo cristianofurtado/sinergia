@@ -46,6 +46,7 @@ export async function POST(request: NextRequest) {
 
     let category: "video" | "document" | "image";
     let mimeType: string;
+    let autoTitle: string | undefined;
 
     if (body.category && body.category !== "auto") {
       category = body.category;
@@ -54,9 +55,13 @@ export async function POST(request: NextRequest) {
       const meta = await detectExternalUrlMetadata(safeUrl.toString());
       category = meta.category;
       mimeType = meta.mimeType;
+      autoTitle = meta.suggestedTitle;
     }
 
-    const finalTitle = title || safeUrl.hostname + (safeUrl.pathname !== "/" ? safeUrl.pathname.slice(0, 50) : "");
+    // Mascara o título para nunca expor domínio/URL real
+    const fallbackCategoryName =
+      category === "video" ? "Vídeo compartilhado" : category === "image" ? "Imagem compartilhada" : "Documento compartilhado";
+    const finalTitle = title || autoTitle || fallbackCategoryName;
 
     const db = getDb();
     const id = crypto.randomUUID();

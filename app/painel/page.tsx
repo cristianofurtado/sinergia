@@ -49,13 +49,28 @@ export default async function PainelPage() {
           expiresInSeconds: 3600,
         }).catch(() => null);
       } else if (!row.r2Key && row.mimeType.endsWith("/external-url")) {
-        mediaUrl = row.originalName;
+        // Se for YouTube, Vimeo ou Google Drive, usa o link direto para o iframe embed
+        const isEmbedIframe =
+          row.originalName.includes("youtube.com") ||
+          row.originalName.includes("youtu.be") ||
+          row.originalName.includes("vimeo.com") ||
+          row.originalName.includes("drive.google.com") ||
+          row.originalName.includes("loom.com");
+
+        if (isEmbedIframe) {
+          mediaUrl = row.originalName;
+        } else {
+          // Para todo outro link externo (vídeo direto, áudio, imagem ou doc em servidor privado),
+          // mascara através da rota interna /api/media/[id].
+          // Assim, a URL real, o servidor, porta e subdomínio nunca são expostos ao usuário!
+          mediaUrl = `/api/media/${encodeURIComponent(row.id)}`;
+        }
       }
       return {
         id: row.id,
         category: row.category,
         title: row.title,
-        originalName: row.originalName,
+        originalName: row.title, // Mascara o originalName para não vazar a URL no client
         mimeType: row.mimeType,
         sizeBytes: row.sizeBytes,
         textBody: row.textBody,

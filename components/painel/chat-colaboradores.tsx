@@ -114,7 +114,7 @@ export function ChatColaboradores({
 
   async function handleDownload(item: ChatFeedItem) {
     setErrorMsg(null);
-    if (item.mimeType.endsWith("/external-url") && item.mediaUrl) {
+    if (item.mediaUrl) {
       window.open(item.mediaUrl, "_blank", "noopener,noreferrer");
       return;
     }
@@ -734,11 +734,11 @@ export function ChatColaboradores({
                           <button
                             type="button"
                             onClick={() => handleDownload(item)}
-                            title={item.mimeType.endsWith("/external-url") ? "Abrir link" : "Baixar"}
+                            title={item.mimeType.endsWith("/external-url") ? "Acessar documento" : "Baixar"}
                             className="rounded-lg border border-slate-300 bg-white p-2 text-slate-700 hover:bg-slate-100"
                           >
                             {item.mimeType.endsWith("/external-url") ? (
-                              <ExternalLink className="w-4 h-4" />
+                              <Eye className="w-4 h-4" />
                             ) : (
                               <Download className="w-4 h-4" />
                             )}

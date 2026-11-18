@@ -33,6 +33,7 @@ export function extractUrlFromText(text: string): { url: string; cleanText: stri
 export async function detectExternalUrlMetadata(rawUrl: string): Promise<{
   category: ExternalLinkCategory;
   mimeType: string;
+  suggestedTitle?: string;
 }> {
   const safe = parseSafeExternalUrl(rawUrl);
   if (!safe) return { category: "document", mimeType: "document/external-url" };
@@ -47,7 +48,7 @@ export async function detectExternalUrlMetadata(rawUrl: string): Promise<{
   }
 
   // 2. Se a URL não tem extensão óbvia (ex: CDN, encurtador, s3/storage personalizado como midia.gamesnolinux.com.br/-xxx)
-  // Faz uma requisição leve com Range bytes=0-1024 para detectar o Content-Type real
+  // Faz uma requisição leve com Range bytes=0-1024 para detectar o Content-Type real e cabeçalhos
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 2500);
@@ -62,14 +63,24 @@ export async function detectExternalUrlMetadata(rawUrl: string): Promise<{
     }).finally(() => clearTimeout(timeout));
 
     const ct = (res.headers.get("content-type") || "").toLowerCase().trim();
+    const disp = res.headers.get("content-disposition");
+    let suggestedTitle: string | undefined;
+
+    if (disp) {
+      const match = disp.match(/filename\*?=(?:UTF-8'[\w%]*')?"?([^";]+)"?/i);
+      if (match?.[1]) {
+        suggestedTitle = decodeURIComponent(match[1].trim());
+      }
+    }
+
     if (ct.startsWith("video/")) {
-      return { category: "video", mimeType: "video/external-url" };
+      return { category: "video", mimeType: "video/external-url", suggestedTitle };
     }
     if (ct.startsWith("image/")) {
-      return { category: "image", mimeType: "image/external-url" };
+      return { category: "image", mimeType: "image/external-url", suggestedTitle };
     }
     if (ct.includes("pdf") || ct.includes("application/")) {
-      return { category: "document", mimeType: "document/external-url" };
+      return { category: "document", mimeType: "document/external-url", suggestedTitle };
     }
   } catch {
     // Fallback silencioso para document se a requisição falhar ou der timeout
