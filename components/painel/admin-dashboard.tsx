@@ -15,8 +15,15 @@ import {
   Send,
   Paperclip,
   Link2,
+  Eye,
 } from "lucide-react";
-import { inferCategoryFromUrl, parseSafeExternalUrl } from "@/lib/external-links";
+import {
+  getExternalDocumentEmbed,
+  getExternalImageSrc,
+  getExternalVideoEmbed,
+  inferCategoryFromUrl,
+  parseSafeExternalUrl,
+} from "@/lib/external-links";
 import { inferCategoryFromMime, resolveMimeType } from "@/lib/file-validation";
 import type { PainelFileItem } from "./colaborador-browser";
 
@@ -44,17 +51,17 @@ const CATEGORY_OPTIONS: { value: UploadCategory; label: string; hint?: string }[
   {
     value: "video",
     label: "Vídeos",
-    hint: "MP4, WEBM, MOV, AVI, MKV (até 500 MB por arquivo)",
+    hint: "MP4, WEBM, MOV, AVI, MKV ou links YouTube, Vimeo, Loom, Drive (até 500 MB)",
   },
   {
     value: "document",
     label: "Documentos",
-    hint: "PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, CSV, ZIP (até 50 MB por arquivo)",
+    hint: "PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, CSV, ZIP ou links Drive/Docs (até 50 MB)",
   },
   {
     value: "image",
     label: "Imagens e GIFs",
-    hint: "PNG, JPG, JPEG, WEBP, GIF, SVG (até 20 MB por arquivo)",
+    hint: "PNG, JPG, JPEG, WEBP, GIF, SVG ou links diretos de imagem/Drive (até 20 MB)",
   },
 ];
 
@@ -79,7 +86,7 @@ export function AdminDashboard({
   const [files, setFiles] = useState(initialFiles);
   const [users, setUsers] = useState(initialUsers);
 
-  // Compositor unificado (Arquivo e/ou Texto)
+  // Compositor unificado (Arquivo, Link e/ou Texto com Nome e Legenda)
   const [category, setCategory] = useState<UploadCategory>("auto");
   const [postTitle, setPostTitle] = useState("");
   const [postText, setPostText] = useState("");
@@ -90,9 +97,10 @@ export function AdminDashboard({
   const [isPublishing, setIsPublishing] = useState(false);
   const [progress, setProgress] = useState<string>("");
 
-  // Edição inline na lista
+  // Edição inline na lista (Nome, Legenda e Categoria)
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
+  const [editTextBody, setEditTextBody] = useState("");
   const [editCategory, setEditCategory] = useState<PainelFileItem["category"]>("document");
   const [filterCat, setFilterCat] = useState<string>("all");
 
@@ -139,7 +147,7 @@ export function AdminDashboard({
     if (invalidLinks.length > 0) {
       setFeedback({
         type: "error",
-        text: `Link inválido: "${invalidLinks[0].raw}". Use URLs completas com https:// ou http://.`,
+        text: `Link inválido: "${invalidLinks[0].raw}". Cole um link válido (ex.: https://...).`,
       });
       return;
     }
@@ -147,7 +155,7 @@ export function AdminDashboard({
     if (queuedFiles.length === 0 && validLinks.length === 0 && !cleanText) {
       setFeedback({
         type: "error",
-        text: "Escreva um texto, cole um link ou anexe pelo menos um arquivo antes de publicar.",
+        text: "Escreva uma mensagem/legenda, cole um link ou anexe pelo menos um arquivo antes de publicar.",
       });
       return;
     }
@@ -178,19 +186,24 @@ export function AdminDashboard({
         return;
       }
 
-      // Caso 2: Links externos colados (vídeos, fotos ou documentos)
+      // Caso 2: Links externos colados (vídeos, fotos ou documentos) com nome personalizado e legenda
       let publishedCount = 0;
       for (let i = 0; i < validLinks.length; i++) {
         const link = validLinks[i];
-        setProgress(`[${i + 1}/${validLinks.length}] Salvando link externo...`);
+        setProgress(`[${i + 1}/${validLinks.length}] Publicando link no chat...`);
+        const itemTitle = cleanTitle
+          ? validLinks.length > 1
+            ? `${cleanTitle} #${i + 1}`
+            : cleanTitle
+          : undefined;
         const res = await fetch("/api/admin/files", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             linkUrl: link.raw,
-            category,
-            title: validLinks.length === 1 && queuedFiles.length === 0 ? cleanTitle : undefined,
-            textBody: i === 0 && queuedFiles.length === 0 ? cleanText : undefined,
+            category: category === "auto" ? "auto" : category,
+            title: itemTitle,
+            textBody: cleanText || undefined,
           }),
         });
         if (!res.ok) {
@@ -201,15 +214,18 @@ export function AdminDashboard({
         publishedCount += 1;
       }
 
-      // Caso 3: 1 ou mais arquivos no R2 (com ou sem legenda/texto junto)
+      // Caso 3: 1 ou mais arquivos no R2 (com nome personalizado e legenda)
       let uploadedCount = 0;
       for (let i = 0; i < queuedFiles.length; i++) {
         const file = queuedFiles[i];
         const mimeType = resolveMimeType(file.name, file.type);
         const targetCat = category === "auto" ? inferCategoryFromMime(mimeType) : category;
-        const titleToUse =
-          queuedFiles.length === 1 && cleanTitle ? cleanTitle : file.name;
-        const captionToUse = i === 0 && cleanText ? cleanText : undefined;
+        const titleToUse = cleanTitle
+          ? queuedFiles.length > 1
+            ? `${cleanTitle} #${i + 1}`
+            : cleanTitle
+          : file.name;
+        const captionToUse = cleanText || undefined;
 
         setProgress(`[${i + 1}/${queuedFiles.length}] Preparando ${file.name}...`);
         const presignRes = await fetch("/api/files/presign", {
@@ -319,21 +335,35 @@ export function AdminDashboard({
     const res = await fetch("/api/admin/files", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, title: editTitle, category: editCategory }),
+      body: JSON.stringify({
+        id,
+        title: editTitle,
+        category: editCategory,
+        textBody: editTextBody,
+      }),
     });
     if (res.ok) {
       setFiles((prev) =>
-        prev.map((f) => (f.id === id ? { ...f, title: editTitle.trim() || f.title, category: editCategory } : f))
+        prev.map((f) =>
+          f.id === id
+            ? {
+                ...f,
+                title: editTitle.trim() || f.title,
+                category: editCategory,
+                textBody: editTextBody.trim() || null,
+              }
+            : f
+        )
       );
       setEditingId(null);
-      setFeedback({ type: "success", text: "Item atualizado." });
+      setFeedback({ type: "success", text: "Nome, legenda e categoria atualizados." });
     } else {
       setFeedback({ type: "error", text: "Não foi possível atualizar o item." });
     }
   }
 
   async function handleDeleteFile(id: string) {
-    if (!window.confirm("Confirmar exclusão definitiva do arquivo?")) return;
+    if (!window.confirm("Confirmar exclusão definitiva do item?")) return;
     const res = await fetch(`/api/admin/files?id=${encodeURIComponent(id)}`, { method: "DELETE" });
     if (res.ok) {
       setFiles((prev) => prev.filter((f) => f.id !== id));
@@ -353,6 +383,8 @@ export function AdminDashboard({
       setFeedback({ type: "error", text: err.error ?? "Erro ao atualizar papel" });
     }
   }
+
+  const firstValidLink = parsedLinks.find((l) => l.valid);
 
   return (
     <div className="space-y-6">
@@ -411,7 +443,7 @@ export function AdminDashboard({
 
       {activeTab === "conteudo" && (
         <div className="space-y-6">
-          {/* Card único: Nova Publicação (Arquivos e/ou Texto) */}
+          {/* Card único: Nova Publicação (Arquivos, Links e/ou Texto) */}
           <form
             onSubmit={handlePublish}
             className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 space-y-5 shadow-xs"
@@ -422,7 +454,7 @@ export function AdminDashboard({
                   Nova Publicação no Chat Colaboradores
                 </h2>
                 <p className="text-xs text-slate-500">
-                  Envie só texto, só arquivo(s), ou arquivo(s) com texto/legenda juntos.
+                  Suba arquivos, cole links (YouTube, Vimeo, Drive, fotos, PDFs) e adicione nome personalizado e legenda.
                 </p>
               </div>
               <a
@@ -434,82 +466,45 @@ export function AdminDashboard({
               </a>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-              {/* Lado Texto / Título */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <label htmlFor="post-title" className="text-xs font-bold text-slate-700">
-                    Título (opcional)
-                  </label>
+            {/* 1. Seleção de Categoria + Legenda de formatos */}
+            <div className="space-y-2.5">
+              <div className="flex flex-wrap gap-2">
+                {CATEGORY_OPTIONS.map((opt) => (
                   <button
+                    key={opt.value}
                     type="button"
-                    onClick={() => setTextPreview((v) => !v)}
-                    className="text-xs font-semibold text-[#0e526c] hover:underline"
-                  >
-                    {textPreview ? "Editar texto" : "Pré-visualizar texto"}
-                  </button>
-                </div>
-
-                <input
-                  id="post-title"
-                  type="text"
-                  disabled={isPublishing}
-                  value={postTitle}
-                  onChange={(e) => setPostTitle(e.target.value)}
-                  placeholder="Ex.: Treinamento Comercial ou Tabela Atualizada"
-                  className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0e526c]"
-                />
-
-                {textPreview ? (
-                  <pre className="whitespace-pre-wrap text-sm text-slate-800 bg-slate-50 border border-slate-200 rounded-xl p-3.5 min-h-[140px]">
-                    {postText || "Nada para pré-visualizar."}
-                  </pre>
-                ) : (
-                  <textarea
-                    rows={6}
                     disabled={isPublishing}
-                    value={postText}
-                    onChange={(e) => setPostText(e.target.value)}
-                    placeholder="Escreva a mensagem, aviso ou legenda que acompanha os arquivos..."
-                    className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0e526c]"
-                  />
-                )}
+                    onClick={() => setCategory(opt.value)}
+                    className={`rounded-lg px-3 py-1.5 text-xs font-bold transition-colors ${
+                      category === opt.value
+                        ? "bg-[#0e526c] text-white"
+                        : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
               </div>
 
-              {/* Lado Arquivos (R2) */}
-              <div className="space-y-3">
-                <div className="flex flex-wrap gap-2">
-                  {CATEGORY_OPTIONS.map((opt) => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      disabled={isPublishing}
-                      onClick={() => setCategory(opt.value)}
-                      className={`rounded-lg px-3 py-1.5 text-xs font-bold transition-colors ${
-                        category === opt.value
-                          ? "bg-[#0e526c] text-white"
-                          : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                      }`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="rounded-xl bg-slate-50 border border-slate-200 px-3.5 py-2.5 text-xs text-slate-600 space-y-1">
-                  <p className="font-semibold text-slate-800">
-                    O que pode importar em cada opção:
+              <div className="rounded-xl bg-slate-50 border border-slate-200 px-3.5 py-2.5 text-xs text-slate-600 space-y-1">
+                <p className="font-semibold text-slate-800">
+                  O que pode importar ou colar link em cada opção:
+                </p>
+                {CATEGORY_OPTIONS.filter((o) => o.hint).map((opt) => (
+                  <p
+                    key={opt.value}
+                    className={category === opt.value ? "text-[#0e526c] font-semibold" : ""}
+                  >
+                    <strong>{opt.label}:</strong> {opt.hint}
                   </p>
-                  {CATEGORY_OPTIONS.filter((o) => o.hint).map((opt) => (
-                    <p
-                      key={opt.value}
-                      className={category === opt.value ? "text-[#0e526c] font-semibold" : ""}
-                    >
-                      <strong>{opt.label}:</strong> {opt.hint}
-                    </p>
-                  ))}
-                </div>
+                ))}
+              </div>
+            </div>
 
+            {/* 2. Anexar Arquivos e Colar Links */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Subir arquivo */}
+              <div className="space-y-2">
                 <label
                   onDragOver={(e) => {
                     e.preventDefault();
@@ -521,7 +516,7 @@ export function AdminDashboard({
                     setIsDragging(false);
                     addFilesToQueue(Array.from(e.dataTransfer.files));
                   }}
-                  className={`flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-5 text-center cursor-pointer transition-colors ${
+                  className={`flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-5 text-center cursor-pointer transition-colors min-h-[132px] ${
                     isDragging
                       ? "border-[#0e526c] bg-sky-50"
                       : "border-slate-300 bg-slate-50/70 hover:border-[#0e526c]/60"
@@ -547,49 +542,6 @@ export function AdminDashboard({
                     className="sr-only"
                   />
                 </label>
-
-                <div className="space-y-1.5">
-                  <label
-                    htmlFor="external-links"
-                    className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700"
-                  >
-                    <Link2 className="w-3.5 h-3.5 text-[#0e526c]" />
-                    <span>Colar links de vídeos, fotos ou documentos (opcional, 1 por linha)</span>
-                  </label>
-                  <textarea
-                    id="external-links"
-                    rows={2}
-                    disabled={isPublishing}
-                    value={externalLinksInput}
-                    onChange={(e) => setExternalLinksInput(e.target.value)}
-                    placeholder="https://www.youtube.com/watch?v=... ou link direto de foto/PDF/Drive"
-                    className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#0e526c]"
-                  />
-                  {parsedLinks.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5">
-                      {parsedLinks.map((l, idx) => (
-                        <span
-                          key={idx}
-                          className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
-                            l.valid
-                              ? "bg-sky-50 text-[#0e526c] border border-sky-200"
-                              : "bg-red-50 text-red-700 border border-red-200"
-                          }`}
-                        >
-                          {l.valid
-                            ? `Link ${idx + 1}: ${
-                                l.detected === "video"
-                                  ? "Vídeo"
-                                  : l.detected === "image"
-                                    ? "Foto / GIF"
-                                    : "Documento"
-                              }`
-                            : `Link ${idx + 1}: URL inválida`}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
 
                 {queuedFiles.length > 0 && (
                   <ul className="space-y-1.5 max-h-32 overflow-y-auto">
@@ -619,13 +571,172 @@ export function AdminDashboard({
                   </ul>
                 )}
               </div>
+
+              {/* Colar Links */}
+              <div className="space-y-2 flex flex-col justify-between">
+                <div className="space-y-1.5">
+                  <label
+                    htmlFor="external-links"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700"
+                  >
+                    <Link2 className="w-3.5 h-3.5 text-[#0e526c]" />
+                    <span>Colar links de vídeos, fotos ou documentos (opcional, 1 por linha)</span>
+                  </label>
+                  <textarea
+                    id="external-links"
+                    rows={3}
+                    disabled={isPublishing}
+                    value={externalLinksInput}
+                    onChange={(e) => setExternalLinksInput(e.target.value)}
+                    placeholder="https://www.youtube.com/watch?v=... ou link de foto/PDF/Google Drive"
+                    className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#0e526c]"
+                  />
+                </div>
+
+                {parsedLinks.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {parsedLinks.map((l, idx) => (
+                      <span
+                        key={idx}
+                        className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
+                          l.valid
+                            ? "bg-sky-50 text-[#0e526c] border border-sky-200"
+                            : "bg-red-50 text-red-700 border border-red-200"
+                        }`}
+                      >
+                        {l.valid
+                          ? `Link ${idx + 1}: Visualizado no Chat como ${
+                              l.detected === "video"
+                                ? "Vídeo"
+                                : l.detected === "image"
+                                  ? "Foto / GIF"
+                                  : "Documento"
+                            }`
+                          : `Link ${idx + 1}: URL inválida`}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* 3. Nome Personalizado e Legenda (sempre visíveis junto da publicação) */}
+            <div className="rounded-2xl bg-slate-50/80 border border-slate-200 p-4 space-y-3">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label htmlFor="post-title" className="text-xs font-bold text-slate-800 block">
+                    Nome personalizado do arquivo / link (opcional)
+                  </label>
+                  <input
+                    id="post-title"
+                    type="text"
+                    disabled={isPublishing}
+                    value={postTitle}
+                    onChange={(e) => setPostTitle(e.target.value)}
+                    placeholder="Ex.: Vídeo de Treinamento Comercial ou Tabela Oficial"
+                    className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0e526c]"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <label htmlFor="post-caption" className="text-xs font-bold text-slate-800">
+                      Legenda ou Mensagem no Chat (opcional se enviar arquivo/link)
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setTextPreview((v) => !v)}
+                      className="text-xs font-semibold text-[#0e526c] hover:underline"
+                    >
+                      {textPreview ? "Editar" : "Pré-visualizar"}
+                    </button>
+                  </div>
+                  {textPreview ? (
+                    <pre className="whitespace-pre-wrap text-sm text-slate-800 bg-white border border-slate-200 rounded-xl p-3 min-h-[76px]">
+                      {postText || "Sem legenda."}
+                    </pre>
+                  ) : (
+                    <textarea
+                      id="post-caption"
+                      rows={2}
+                      disabled={isPublishing}
+                      value={postText}
+                      onChange={(e) => setPostText(e.target.value)}
+                      placeholder="Escreva uma legenda explicativa para o link/arquivo ou publique apenas um comunicado..."
+                      className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0e526c]"
+                    />
+                  )}
+                </div>
+              </div>
+
+              {/* Pré-visualização ao vivo do Link colado */}
+              {firstValidLink && firstValidLink.valid && (
+                <div className="pt-2 border-t border-slate-200/80 space-y-2">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-[#0e526c] flex items-center gap-1.5">
+                    <Eye className="w-3.5 h-3.5" />
+                    Prévia de como aparecerá dentro do Chat Colaboradores:
+                  </p>
+                  <div className="max-w-md bg-white rounded-2xl p-3.5 border border-slate-200 shadow-xs space-y-2">
+                    <p className="text-sm font-bold text-slate-900 break-words">
+                      {postTitle.trim() || "Material compartilhado"}
+                    </p>
+                    {firstValidLink.detected === "video" &&
+                      (() => {
+                        const embed = getExternalVideoEmbed(firstValidLink.raw);
+                        if (embed.type === "iframe") {
+                          return (
+                            <iframe
+                              src={embed.src}
+                              title="Prévia de vídeo"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                              className="w-full aspect-video rounded-xl border border-slate-200 bg-black"
+                            />
+                          );
+                        }
+                        return (
+                          <video
+                            controls
+                            preload="metadata"
+                            src={embed.src}
+                            className="w-full max-h-56 rounded-xl bg-black"
+                          />
+                        );
+                      })()}
+                    {firstValidLink.detected === "image" && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={getExternalImageSrc(firstValidLink.raw)}
+                        alt={postTitle.trim() || "Prévia"}
+                        className="max-h-52 rounded-xl object-contain bg-slate-100"
+                      />
+                    )}
+                    {firstValidLink.detected === "document" &&
+                      (() => {
+                        const docEmbed = getExternalDocumentEmbed(firstValidLink.raw);
+                        return docEmbed ? (
+                          <iframe
+                            src={docEmbed}
+                            title="Prévia de documento"
+                            className="w-full h-48 rounded-xl border border-slate-200 bg-slate-50"
+                          />
+                        ) : null;
+                      })()}
+                    {postText.trim() && (
+                      <p className="text-xs text-slate-700 whitespace-pre-wrap break-words">
+                        {postText.trim()}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100">
               <span className="text-xs font-semibold text-[#0e526c]">
                 {progress ||
                   (queuedFiles.length + parsedLinks.filter((l) => l.valid).length > 0
-                    ? `Pronto para publicar ${queuedFiles.length} arquivo(s) e ${parsedLinks.filter((l) => l.valid).length} link(s).`
+                    ? `Pronto para publicar ${queuedFiles.length} arquivo(s) e ${parsedLinks.filter((l) => l.valid).length} link(s)${postTitle.trim() ? ` com nome "${postTitle.trim()}"` : ""}.`
                     : postText.trim()
                       ? "Pronto para publicar mensagem de texto."
                       : "Escreva um texto, cole links ou anexe arquivos para publicar.")}
@@ -651,7 +762,7 @@ export function AdminDashboard({
           <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 space-y-4 shadow-xs">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <h2 className="text-lg font-bold text-[#0e526c]">
-                Gerenciar Arquivos e Textos ({visibleFiles.length})
+                Gerenciar Arquivos, Links e Textos ({visibleFiles.length})
               </h2>
               <select
                 aria-label="Filtrar arquivos por seção"
@@ -680,50 +791,69 @@ export function AdminDashboard({
                       className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                     >
                       {isEditing ? (
-                        <div className="flex-1 flex flex-wrap gap-2 items-center">
-                          <input
-                            type="text"
-                            value={editTitle}
-                            onChange={(e) => setEditTitle(e.target.value)}
-                            className="flex-1 min-w-[180px] rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm"
+                        <div className="flex-1 space-y-2">
+                          <div className="flex flex-wrap gap-2 items-center">
+                            <input
+                              type="text"
+                              value={editTitle}
+                              onChange={(e) => setEditTitle(e.target.value)}
+                              placeholder="Nome personalizado"
+                              className="flex-1 min-w-[200px] rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm"
+                            />
+                            <select
+                              value={editCategory}
+                              onChange={(e) =>
+                                setEditCategory(e.target.value as PainelFileItem["category"])
+                              }
+                              className="rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs font-semibold"
+                            >
+                              {ALL_CATEGORIES.map((c) => (
+                                <option key={c.value} value={c.value}>
+                                  {c.label}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          <textarea
+                            rows={2}
+                            value={editTextBody}
+                            onChange={(e) => setEditTextBody(e.target.value)}
+                            placeholder="Legenda ou descrição..."
+                            className="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs sm:text-sm"
                           />
-                          <select
-                            value={editCategory}
-                            onChange={(e) =>
-                              setEditCategory(e.target.value as PainelFileItem["category"])
-                            }
-                            className="rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs font-semibold"
-                          >
-                            {ALL_CATEGORIES.map((c) => (
-                              <option key={c.value} value={c.value}>
-                                {c.label}
-                              </option>
-                            ))}
-                          </select>
-                          <button
-                            type="button"
-                            onClick={() => handleSaveEdit(f.id)}
-                            className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-2.5 py-1.5 text-xs font-semibold text-white"
-                          >
-                            <Check className="w-3.5 h-3.5" />
-                            Salvar
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setEditingId(null)}
-                            className="inline-flex items-center gap-1 rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs font-semibold text-slate-600"
-                          >
-                            <X className="w-3.5 h-3.5" />
-                            Cancelar
-                          </button>
+                          <div className="flex gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleSaveEdit(f.id)}
+                              className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white"
+                            >
+                              <Check className="w-3.5 h-3.5" />
+                              Salvar
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setEditingId(null)}
+                              className="inline-flex items-center gap-1 rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-600"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                              Cancelar
+                            </button>
+                          </div>
                         </div>
                       ) : (
                         <>
-                          <div className="min-w-0">
+                          <div className="min-w-0 space-y-0.5">
                             <p className="font-semibold text-slate-900 break-words">{f.title}</p>
-                            <p className="text-xs text-slate-500">
+                            {f.textBody && (
+                              <p className="text-xs text-slate-600 line-clamp-2 break-words">
+                                {f.textBody}
+                              </p>
+                            )}
+                            <p className="text-[11px] text-slate-400">
                               {ALL_CATEGORIES.find((c) => c.value === f.category)?.label ?? f.category} ·{" "}
-                              {(f.sizeBytes / 1024).toFixed(1)} KB
+                              {f.mimeType.endsWith("/external-url")
+                                ? "Link externo"
+                                : `${(f.sizeBytes / 1024).toFixed(1)} KB`}
                             </p>
                           </div>
                           <div className="flex items-center gap-3 shrink-0">
@@ -732,12 +862,13 @@ export function AdminDashboard({
                               onClick={() => {
                                 setEditingId(f.id);
                                 setEditTitle(f.title);
+                                setEditTextBody(f.textBody ?? "");
                                 setEditCategory(f.category);
                               }}
                               className="inline-flex items-center gap-1 text-xs font-semibold text-[#0e526c] hover:underline"
                             >
                               <Pencil className="w-3.5 h-3.5" />
-                              Editar / Mover
+                              Editar nome / legenda
                             </button>
                             <button
                               type="button"

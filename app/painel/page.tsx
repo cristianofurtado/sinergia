@@ -55,6 +55,7 @@ export default async function PainelPage() {
           row.originalName.includes("youtu.be") ||
           row.originalName.includes("vimeo.com") ||
           row.originalName.includes("drive.google.com") ||
+          row.originalName.includes("docs.google.com") ||
           row.originalName.includes("loom.com");
 
         if (isEmbedIframe) {

@@ -1,15 +1,34 @@
 export type ExternalLinkCategory = "video" | "image" | "document";
 
 export function parseSafeExternalUrl(raw: string): URL | null {
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+  const withProtocol = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
   try {
-    const parsed = new URL(raw.trim());
+    const parsed = new URL(withProtocol);
     if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      return null;
+    }
+    if (!parsed.hostname || !parsed.hostname.includes(".")) {
       return null;
     }
     return parsed;
   } catch {
     return null;
   }
+}
+
+export function extractGoogleDriveFileId(url: URL): string | null {
+  const host = url.hostname.replace(/^www\./, "").toLowerCase();
+  if (host !== "drive.google.com" && host !== "docs.google.com") return null;
+
+  const fileMatch = url.pathname.match(/\/(?:file|document|spreadsheets|presentation)\/d\/([a-zA-Z0-9_-]+)/);
+  if (fileMatch?.[1]) return fileMatch[1];
+
+  const idParam = url.searchParams.get("id");
+  if (idParam && /^[a-zA-Z0-9_-]+$/.test(idParam)) return idParam;
+
+  return null;
 }
 
 /**
@@ -22,7 +41,6 @@ export function extractUrlFromText(text: string): { url: string; cleanText: stri
   const safe = parseSafeExternalUrl(rawUrl);
   if (!safe) return null;
 
-  // Remove a URL do texto para deixar legenda/comentário limpo
   const cleanText = text.replace(rawUrl, "").trim();
   return {
     url: safe.toString(),
@@ -38,7 +56,6 @@ export async function detectExternalUrlMetadata(rawUrl: string): Promise<{
   const safe = parseSafeExternalUrl(rawUrl);
   if (!safe) return { category: "document", mimeType: "document/external-url" };
 
-  // 1. Tentar inferir imediatamente por padrões conhecidos de URL (YouTube, Vimeo, extensões)
   const inferred = inferCategoryFromUrl(safe.toString());
   if (inferred === "video") {
     return { category: "video", mimeType: "video/external-url" };
@@ -47,8 +64,6 @@ export async function detectExternalUrlMetadata(rawUrl: string): Promise<{
     return { category: "image", mimeType: "image/external-url" };
   }
 
-  // 2. Se a URL não tem extensão óbvia (ex: CDN, encurtador, s3/storage personalizado como midia.gamesnolinux.com.br/-xxx)
-  // Faz uma requisição leve com Range bytes=0-1024 para detectar o Content-Type real e cabeçalhos
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 2500);
@@ -99,11 +114,16 @@ export function inferCategoryFromUrl(rawUrl: string): ExternalLinkCategory {
     lower.includes("dropbox.com/") ||
     lower.includes("loom.com/share/") ||
     lower.includes("dailymotion.com/") ||
+    lower.includes("midia.") ||
     /\.(mp4|webm|mov|avi|mkv|m4v)(\?|#|$)/.test(lower)
   ) {
     return "video";
   }
-  if (/\.(png|jpe?g|webp|gif|svg|bmp)(\?|#|$)/.test(lower)) {
+  if (
+    /\.(png|jpe?g|webp|gif|svg|bmp|avif)(\?|#|$)/.test(lower) ||
+    lower.includes("imgur.com/") ||
+    lower.includes("giphy.com/")
+  ) {
     return "image";
   }
   return "document";
@@ -113,32 +133,30 @@ export function getExternalVideoEmbed(rawUrl: string): {
   type: "iframe" | "video" | "link";
   src: string;
 } {
-  const url = parseSafeExternalUrl(rawUrl);
+  const trimmed = rawUrl.trim();
+  if (trimmed.startsWith("/")) {
+    return { type: "video", src: trimmed };
+  }
+
+  const url = parseSafeExternalUrl(trimmed);
   if (!url) return { type: "link", src: rawUrl };
 
   const host = url.hostname.replace(/^www\./, "").toLowerCase();
 
-  // YouTube youtu.be/<id>
   if (host === "youtu.be") {
     const id = url.pathname.replace(/^\/+/, "").split("/")[0];
     if (id) return { type: "iframe", src: `https://www.youtube.com/embed/${id}` };
   }
 
-  // YouTube watch?v=<id> ou shorts/<id> ou embed/<id>
   if (host === "youtube.com" || host === "m.youtube.com") {
     const v = url.searchParams.get("v");
     if (v) return { type: "iframe", src: `https://www.youtube.com/embed/${v}` };
-    const shortsMatch = url.pathname.match(/^\/shorts\/([^/?#]+)/);
+    const shortsMatch = url.pathname.match(/^\/(?:shorts|embed|live)\/([^/?#]+)/);
     if (shortsMatch?.[1]) {
       return { type: "iframe", src: `https://www.youtube.com/embed/${shortsMatch[1]}` };
     }
-    const embedMatch = url.pathname.match(/^\/embed\/([^/?#]+)/);
-    if (embedMatch?.[1]) {
-      return { type: "iframe", src: `https://www.youtube.com/embed/${embedMatch[1]}` };
-    }
   }
 
-  // Vimeo
   if (host === "vimeo.com") {
     const id = url.pathname.replace(/^\/+/, "").split("/")[0];
     if (id && /^\d+$/.test(id)) {
@@ -146,7 +164,6 @@ export function getExternalVideoEmbed(rawUrl: string): {
     }
   }
 
-  // Google Drive preview (vídeo ou doc)
   if (host === "drive.google.com") {
     const fileMatch = url.pathname.match(/\/file\/d\/([^/?#]+)/);
     if (fileMatch?.[1]) {
@@ -154,7 +171,6 @@ export function getExternalVideoEmbed(rawUrl: string): {
     }
   }
 
-  // Loom
   if (host === "loom.com") {
     const loomMatch = url.pathname.match(/\/share\/([^/?#]+)/);
     if (loomMatch?.[1]) {
@@ -162,16 +178,41 @@ export function getExternalVideoEmbed(rawUrl: string): {
     }
   }
 
-  // Arquivo direto de vídeo ou stream
-  if (/\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(url.pathname)) {
-    return { type: "video", src: url.toString() };
-  }
-
-  // Se a URL termina com formato de vídeo ou é servida diretamente por host de mídia
-  if (host.startsWith("midia.") || host.includes("video") || host.includes("stream")) {
-    return { type: "video", src: url.toString() };
-  }
-
-  // Fallback padrão: se foi cadastrado como vídeo externo, usar o player HTML5 com a URL direta
   return { type: "video", src: url.toString() };
+}
+
+export function getExternalDocumentEmbed(rawUrl: string): string | null {
+  const trimmed = rawUrl.trim();
+  if (trimmed.startsWith("/")) return trimmed;
+
+  const url = parseSafeExternalUrl(trimmed);
+  if (!url) return null;
+
+  const host = url.hostname.replace(/^www\./, "").toLowerCase();
+  if (host === "docs.google.com") {
+    const match = url.pathname.match(/^\/(document|spreadsheets|presentation)\/d\/([a-zA-Z0-9_-]+)/);
+    if (match?.[1] && match?.[2]) {
+      return `https://docs.google.com/${match[1]}/d/${match[2]}/preview`;
+    }
+  }
+
+  const driveId = extractGoogleDriveFileId(url);
+  if (driveId) {
+    return `https://drive.google.com/file/d/${driveId}/preview`;
+  }
+
+  return url.toString();
+}
+
+export function getExternalImageSrc(rawUrl: string): string {
+  const trimmed = rawUrl.trim();
+  if (trimmed.startsWith("/")) return trimmed;
+
+  const url = parseSafeExternalUrl(trimmed);
+  if (!url) return rawUrl;
+  const driveId = extractGoogleDriveFileId(url);
+  if (driveId) {
+    return `https://lh3.googleusercontent.com/d/${driveId}`;
+  }
+  return url.toString();
 }

@@ -22,8 +22,17 @@ import {
   ChevronLeft,
   ChevronRight,
   ExternalLink,
+  Pencil,
+  Check,
+  Link2,
 } from "lucide-react";
-import { extractUrlFromText, getExternalVideoEmbed } from "@/lib/external-links";
+import {
+  getExternalDocumentEmbed,
+  getExternalImageSrc,
+  getExternalVideoEmbed,
+  inferCategoryFromUrl,
+  parseSafeExternalUrl,
+} from "@/lib/external-links";
 import { inferCategoryFromMime, resolveMimeType } from "@/lib/file-validation";
 
 export interface ChatFeedItem {
@@ -55,11 +64,23 @@ export function ChatColaboradores({
   const [activeVideoIndex, setActiveVideoIndex] = useState(0);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
+
+  // Barra inferior de envio rápido (Admin)
+  const [messageTitle, setMessageTitle] = useState("");
   const [messageText, setMessageText] = useState("");
+  const [linkInputOpen, setLinkInputOpen] = useState(false);
+  const [quickLinkUrl, setQuickLinkUrl] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string>("");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+
+  // Edição inline de Nome e Legenda na bolha do chat (Admin)
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editCaption, setEditCaption] = useState("");
+
+  // Lightbox / Visualizador interno no chat
   const [lightbox, setLightbox] = useState<{ item: ChatFeedItem; url: string } | null>(null);
 
   useEffect(() => {
@@ -131,42 +152,59 @@ export function ChatColaboradores({
     window.open(data.downloadUrl, "_blank", "noopener,noreferrer");
   }
 
-  async function handleSendText(e: React.FormEvent) {
+  async function handleSendFromBar(e: React.FormEvent) {
     e.preventDefault();
-    const text = messageText.trim();
-    if (!text || !isAdmin || isSending) return;
+    if (!isAdmin || isSending) return;
+
+    const cleanTitle = messageTitle.trim();
+    const cleanText = messageText.trim();
+    const cleanLink = quickLinkUrl.trim();
+
+    if (!cleanLink && !cleanText) return;
+
     setErrorMsg(null);
     setIsSending(true);
     try {
-      const extracted = extractUrlFromText(text);
-      let payload: Record<string, unknown>;
-
-      if (extracted) {
-        // Link detectado de forma inteligente no chat
-        const title = extracted.cleanText
-          ? extracted.cleanText.split("\n")[0].slice(0, 80)
-          : undefined;
-        payload = {
-          linkUrl: extracted.url,
-          title,
-          textBody: extracted.cleanText || undefined,
-        };
+      if (cleanLink) {
+        const parsed = parseSafeExternalUrl(cleanLink);
+        if (!parsed) {
+          setErrorMsg("Link inválido. Use http:// ou https://.");
+          return;
+        }
+        const detectedCat = inferCategoryFromUrl(parsed.toString());
+        const res = await fetch("/api/admin/files", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            linkUrl: parsed.toString(),
+            category: detectedCat,
+            title: cleanTitle || undefined,
+            textBody: cleanText || undefined,
+          }),
+        });
+        if (!res.ok) {
+          const err = (await res.json().catch(() => ({}))) as { error?: string };
+          setErrorMsg(err.error ?? "Erro ao publicar link.");
+          return;
+        }
       } else {
-        const firstLine = text.split("\n")[0].slice(0, 80);
-        payload = { title: firstLine, textBody: text };
+        const derivedTitle = cleanTitle || cleanText.split("\n")[0].slice(0, 80);
+        const res = await fetch("/api/admin/files", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ title: derivedTitle, textBody: cleanText }),
+        });
+        if (!res.ok) {
+          const err = (await res.json().catch(() => ({}))) as { error?: string };
+          setErrorMsg(err.error ?? "Erro ao publicar mensagem.");
+          return;
+        }
       }
 
-      const res = await fetch("/api/admin/files", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) {
-        const err = (await res.json().catch(() => ({}))) as { error?: string };
-        setErrorMsg(err.error ?? "Erro ao publicar mensagem.");
-        return;
-      }
+      setMessageTitle("");
       setMessageText("");
+      setQuickLinkUrl("");
+      setLinkInputOpen(false);
       router.refresh();
     } finally {
       setIsSending(false);
@@ -177,11 +215,20 @@ export function ChatColaboradores({
     if (!isAdmin || fileList.length === 0 || isSending) return;
     setErrorMsg(null);
     setIsSending(true);
+    const cleanTitle = messageTitle.trim();
+    const cleanCaption = messageText.trim();
+
     try {
       for (let i = 0; i < fileList.length; i++) {
         const file = fileList[i];
         const mimeType = resolveMimeType(file.name, file.type);
         const category = inferCategoryFromMime(mimeType);
+        const itemTitle = cleanTitle
+          ? fileList.length > 1
+            ? `${cleanTitle} #${i + 1}`
+            : cleanTitle
+          : file.name;
+
         setUploadStatus(`[${i + 1}/${fileList.length}] Enviando ${file.name}...`);
 
         const presignRes = await fetch("/api/files/presign", {
@@ -190,7 +237,7 @@ export function ChatColaboradores({
           body: JSON.stringify({
             action: "put",
             category,
-            title: file.name,
+            title: itemTitle,
             mimeType,
             sizeBytes: file.size,
             fileName: file.name,
@@ -224,7 +271,8 @@ export function ChatColaboradores({
           body: JSON.stringify({
             action: "confirm",
             category,
-            title: file.name,
+            title: itemTitle,
+            textBody: cleanCaption || undefined,
             mimeType: presignData.contentType || mimeType,
             sizeBytes: file.size,
             fileName: file.name,
@@ -236,10 +284,41 @@ export function ChatColaboradores({
           setErrorMsg(err.error ?? `Erro ao salvar ${file.name}.`);
         }
       }
+      setMessageTitle("");
+      setMessageText("");
       router.refresh();
     } finally {
       setIsSending(false);
       setUploadStatus("");
+    }
+  }
+
+  async function handleSaveInlineEdit(id: string) {
+    if (!isAdmin) return;
+    const res = await fetch("/api/admin/files", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id,
+        title: editTitle.trim(),
+        textBody: editCaption.trim(),
+      }),
+    });
+    if (res.ok) {
+      setItems((prev) =>
+        prev.map((item) =>
+          item.id === id
+            ? {
+                ...item,
+                title: editTitle.trim() || item.title,
+                textBody: editCaption.trim() || null,
+              }
+            : item
+        )
+      );
+      setEditingItemId(null);
+    } else {
+      setErrorMsg("Não foi possível salvar a edição.");
     }
   }
 
@@ -272,8 +351,64 @@ export function ChatColaboradores({
     if (idx < 0) return;
     const next = imageList[(idx + delta + imageList.length) % imageList.length];
     if (next?.mediaUrl) {
-      setLightbox({ item: next, url: next.mediaUrl });
+      setLightbox({ item: next, url: getExternalImageSrc(next.mediaUrl) });
     }
+  }
+
+  function renderVideoPlayer(item: ChatFeedItem, onEnded?: () => void) {
+    if (!item.mediaUrl) return null;
+    const isExt = item.mimeType.endsWith("/external-url");
+    if (isExt) {
+      const embed = getExternalVideoEmbed(item.mediaUrl);
+      if (embed.type === "iframe") {
+        return (
+          <iframe
+            key={item.id}
+            src={embed.src}
+            title={item.title}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            className="w-full aspect-video rounded-xl border border-slate-200 bg-black"
+          />
+        );
+      }
+      if (embed.type === "video") {
+        return (
+          <video
+            key={item.id}
+            controls
+            preload="metadata"
+            src={embed.src}
+            onEnded={onEnded}
+            className="w-full max-h-96 rounded-xl bg-black"
+          />
+        );
+      }
+      return (
+        <div className="rounded-xl bg-slate-900 text-white p-5 space-y-3">
+          <a
+            href={embed.src}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-xl bg-amber-400 px-4 py-2 text-xs font-extrabold text-slate-950 hover:bg-amber-300"
+          >
+            <ExternalLink className="w-4 h-4" />
+            Assistir vídeo
+          </a>
+        </div>
+      );
+    }
+
+    return (
+      <video
+        key={item.id}
+        controls
+        preload="metadata"
+        src={item.mediaUrl}
+        onEnded={onEnded}
+        className="w-full max-h-96 rounded-xl bg-black"
+      />
+    );
   }
 
   return (
@@ -402,7 +537,7 @@ export function ChatColaboradores({
             </p>
             <p className="text-xs text-slate-500 leading-relaxed">
               {isAdmin
-                ? "Envie textos, vídeos, documentos, imagens ou GIFs usando a barra abaixo."
+                ? "Envie textos, links, vídeos, documentos, imagens ou GIFs usando a barra abaixo."
                 : "Os materiais publicados pelos administradores aparecerão aqui em ordem de publicação."}
             </p>
           </div>
@@ -410,69 +545,13 @@ export function ChatColaboradores({
           /* PLAYLIST DE VÍDEOS EM ORDEM DE PUBLICAÇÃO */
           <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4">
             <div className="lg:col-span-2 bg-white rounded-2xl p-4 shadow-xs border border-black/5 space-y-3">
-              {currentVideo?.mediaUrl && (
+              {currentVideo && (
                 <>
-                  {currentVideo.mimeType === "video/external-url" ? (
-                    (() => {
-                      const embed = getExternalVideoEmbed(currentVideo.mediaUrl);
-                      if (embed.type === "iframe") {
-                        return (
-                          <iframe
-                            key={currentVideo.id}
-                            src={embed.src}
-                            title={currentVideo.title}
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                            className="w-full aspect-video rounded-xl border border-slate-200 bg-black"
-                          />
-                        );
-                      }
-                      if (embed.type === "video") {
-                        return (
-                          <video
-                            key={currentVideo.id}
-                            controls
-                            src={embed.src}
-                            onEnded={() => {
-                              if (activeVideoIndex < visibleItems.length - 1) {
-                                setActiveVideoIndex((i) => i + 1);
-                              }
-                            }}
-                            className="w-full rounded-xl max-h-[60vh] bg-black"
-                          />
-                        );
-                      }
-                      return (
-                        <div className="rounded-xl bg-slate-100 p-8 text-center space-y-3">
-                          <p className="text-sm font-semibold text-slate-700">
-                            Vídeo hospedado externamente
-                          </p>
-                          <a
-                            href={embed.src}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 rounded-xl bg-[#0e526c] px-4 py-2 text-xs font-bold text-white hover:bg-[#0b4156]"
-                          >
-                            <ExternalLink className="w-4 h-4" />
-                            Abrir vídeo externo
-                          </a>
-                        </div>
-                      );
-                    })()
-                  ) : (
-                    <video
-                      key={currentVideo.id}
-                      controls
-                      autoPlay={false}
-                      src={currentVideo.mediaUrl}
-                      onEnded={() => {
-                        if (activeVideoIndex < visibleItems.length - 1) {
-                          setActiveVideoIndex((i) => i + 1);
-                        }
-                      }}
-                      className="w-full rounded-xl max-h-[60vh] bg-black"
-                    />
-                  )}
+                  {renderVideoPlayer(currentVideo, () => {
+                    if (activeVideoIndex < visibleItems.length - 1) {
+                      setActiveVideoIndex((i) => i + 1);
+                    }
+                  })}
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="text-xs font-bold text-[#0e526c]">
@@ -539,53 +618,56 @@ export function ChatColaboradores({
         ) : activeFilter === "image" ? (
           /* PLAYLIST / GALERIA DE FOTOS E GIFS EM ORDEM DE PUBLICAÇÃO */
           <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {visibleItems.map((img, idx) => (
-              <article
-                key={img.id}
-                className="bg-white rounded-2xl overflow-hidden shadow-xs border border-black/5 flex flex-col justify-between"
-              >
-                {img.mediaUrl && (
-                  <button
-                    type="button"
-                    onClick={() => setLightbox({ item: img, url: img.mediaUrl! })}
-                    className="bg-slate-100 h-52 w-full overflow-hidden"
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={img.mediaUrl}
-                      alt={img.title}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform"
-                    />
-                  </button>
-                )}
-                <div className="p-3.5 space-y-1.5">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-[11px] font-bold text-[#0e526c]">
-                      #{idx + 1} · {img.authorName}
-                    </span>
-                    {isAdmin && (
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(img.id)}
-                        aria-label="Excluir imagem"
-                        className="text-slate-400 hover:text-red-600"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-                  </div>
-                  <p className="text-xs font-bold text-slate-900 break-words">{img.title}</p>
-                  {img.textBody && (
-                    <p className="text-xs text-slate-700 whitespace-pre-wrap break-words">
-                      {img.textBody}
-                    </p>
+            {visibleItems.map((img, idx) => {
+              const displaySrc = img.mediaUrl ? getExternalImageSrc(img.mediaUrl) : null;
+              return (
+                <article
+                  key={img.id}
+                  className="bg-white rounded-2xl overflow-hidden shadow-xs border border-black/5 flex flex-col justify-between"
+                >
+                  {displaySrc && (
+                    <button
+                      type="button"
+                      onClick={() => setLightbox({ item: img, url: displaySrc })}
+                      className="bg-slate-100 h-52 w-full overflow-hidden"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={displaySrc}
+                        alt={img.title}
+                        className="w-full h-full object-cover hover:scale-105 transition-transform"
+                      />
+                    </button>
                   )}
-                  <p className="text-[10px] text-slate-400">
-                    {new Date(img.createdAt).toLocaleString("pt-BR")}
-                  </p>
-                </div>
-              </article>
-            ))}
+                  <div className="p-3.5 space-y-1.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-[11px] font-bold text-[#0e526c]">
+                        #{idx + 1} · {img.authorName}
+                      </span>
+                      {isAdmin && (
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(img.id)}
+                          aria-label="Excluir imagem"
+                          className="text-slate-400 hover:text-red-600"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-xs font-bold text-slate-900 break-words">{img.title}</p>
+                    {img.textBody && (
+                      <p className="text-xs text-slate-700 whitespace-pre-wrap break-words">
+                        {img.textBody}
+                      </p>
+                    )}
+                    <p className="text-[10px] text-slate-400">
+                      {new Date(img.createdAt).toLocaleString("pt-BR")}
+                    </p>
+                  </div>
+                </article>
+              );
+            })}
           </div>
         ) : (
           /* FEED CHAT COMPLETO OU PLAYLIST DE TEXTOS / DOCUMENTOS EM ORDEM DE PUBLICAÇÃO */
@@ -595,162 +677,209 @@ export function ChatColaboradores({
               minute: "2-digit",
             });
             const dateStr = new Date(item.createdAt).toLocaleDateString("pt-BR");
-            const sizeLabel =
-              item.sizeBytes >= 1024 * 1024
+            const isExternal = item.mimeType.endsWith("/external-url");
+            const sizeLabel = isExternal
+              ? "Documento / Link"
+              : item.sizeBytes >= 1024 * 1024
                 ? `${(item.sizeBytes / (1024 * 1024)).toFixed(1)} MB`
                 : `${Math.max(1, Math.round(item.sizeBytes / 1024))} KB`;
+            const isEditingThis = editingItemId === item.id;
 
             return (
               <div key={item.id} className="flex justify-start">
-                <article className="max-w-[92%] sm:max-w-[78%] lg:max-w-[65%] bg-white rounded-2xl rounded-tl-xs px-4 py-3 shadow-xs border border-black/5 space-y-2 relative group">
+                <article className="w-full max-w-[95%] sm:max-w-[80%] lg:max-w-[68%] bg-white rounded-2xl rounded-tl-xs px-4 py-3.5 shadow-xs border border-black/5 space-y-2.5 relative group">
                   <div className="flex items-center justify-between gap-4">
                     <span className="text-xs font-extrabold text-[#0e526c]">
                       {activeFilter !== "all" ? `#${idx + 1} · ` : ""}
                       {item.authorName}
                     </span>
                     {isAdmin && (
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(item.id)}
-                        aria-label="Excluir mensagem"
-                        className="text-slate-400 hover:text-red-600 transition-colors"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingItemId(item.id);
+                            setEditTitle(item.title);
+                            setEditCaption(item.textBody ?? "");
+                          }}
+                          title="Editar nome ou legenda"
+                          aria-label="Editar nome ou legenda"
+                          className="text-slate-400 hover:text-[#0e526c] transition-colors"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(item.id)}
+                          title="Excluir"
+                          aria-label="Excluir mensagem"
+                          className="text-slate-400 hover:text-red-600 transition-colors"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     )}
                   </div>
 
-                  {item.category === "text" && (
-                    <p className="text-sm text-slate-800 whitespace-pre-wrap leading-relaxed break-words">
-                      {item.textBody}
-                    </p>
-                  )}
-
-                  {item.category === "image" && item.mediaUrl && (
-                    <div className="space-y-1.5">
-                      <button
-                        type="button"
-                        onClick={() => setLightbox({ item, url: item.mediaUrl! })}
-                        className="block rounded-xl overflow-hidden bg-slate-100"
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={item.mediaUrl}
-                          alt={item.title}
-                          className="max-h-80 w-auto rounded-xl object-contain"
-                        />
-                      </button>
-                      <p className="text-xs text-slate-600 break-words">{item.title}</p>
-                      {item.textBody && (
-                        <p className="text-sm text-slate-800 whitespace-pre-wrap leading-relaxed break-words pt-1">
-                          {item.textBody}
-                        </p>
-                      )}
-                    </div>
-                  )}
-
-                  {item.category === "video" && item.mediaUrl && (
-                    <div className="space-y-1.5">
-                      {item.mimeType === "video/external-url" ? (
-                        (() => {
-                          const embed = getExternalVideoEmbed(item.mediaUrl);
-                          if (embed.type === "iframe") {
-                            return (
-                              <div className="w-full sm:w-[460px] max-w-full aspect-video rounded-xl overflow-hidden border border-slate-200 bg-black shadow-xs">
-                                <iframe
-                                  src={embed.src}
-                                  title={item.title}
-                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                  allowFullScreen
-                                  className="w-full h-full border-0"
-                                />
-                              </div>
-                            );
-                          }
-                          if (embed.type === "video") {
-                            return (
-                              <video
-                                controls
-                                preload="metadata"
-                                src={embed.src}
-                                className="w-full sm:w-[460px] max-w-full max-h-80 rounded-xl bg-black shadow-xs"
-                              />
-                            );
-                          }
-                          return (
-                            <a
-                              href={embed.src}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 rounded-xl bg-[#0e526c] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#0b4156] shadow-xs transition-colors"
-                            >
-                              <ExternalLink className="w-4 h-4" />
-                              Abrir vídeo externo
-                            </a>
-                          );
-                        })()
-                      ) : (
-                        <video
-                          controls
-                          preload="metadata"
-                          src={item.mediaUrl}
-                          className="w-full sm:w-[460px] max-w-full max-h-80 rounded-xl bg-black shadow-xs"
-                        />
-                      )}
-                      <p className="text-xs font-medium text-slate-700 break-words">{item.title}</p>
-                      {item.textBody && (
-                        <p className="text-sm text-slate-800 whitespace-pre-wrap leading-relaxed break-words pt-0.5">
-                          {item.textBody}
-                        </p>
-                      )}
-                    </div>
-                  )}
-
-                  {(item.category === "document" || item.category === "chat") && (
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-3 rounded-xl bg-slate-50 border border-slate-200/80 p-3">
-                        <div className="w-10 h-10 rounded-lg bg-[#0e526c]/10 text-[#0e526c] flex items-center justify-center shrink-0">
-                          <FileText className="w-5 h-5" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-xs sm:text-sm font-bold text-slate-900 truncate">
-                            {item.title}
-                          </p>
-                          <p className="text-[11px] text-slate-500">
-                            {item.mimeType.endsWith("/external-url") ? "Link externo" : sizeLabel}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-1.5 shrink-0">
-                          {item.mimeType === "application/pdf" && item.mediaUrl && (
-                            <button
-                              type="button"
-                              onClick={() => setLightbox({ item, url: item.mediaUrl! })}
-                              title="Visualizar"
-                              className="rounded-lg bg-[#0e526c] p-2 text-white hover:bg-[#0b4156]"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </button>
-                          )}
-                          <button
-                            type="button"
-                            onClick={() => handleDownload(item)}
-                            title={item.mimeType.endsWith("/external-url") ? "Acessar documento" : "Baixar"}
-                            className="rounded-lg border border-slate-300 bg-white p-2 text-slate-700 hover:bg-slate-100"
-                          >
-                            {item.mimeType.endsWith("/external-url") ? (
-                              <Eye className="w-4 h-4" />
-                            ) : (
-                              <Download className="w-4 h-4" />
-                            )}
-                          </button>
-                        </div>
+                  {/* Edição rápida de Nome e Legenda na bolha */}
+                  {isEditingThis ? (
+                    <div className="space-y-2 rounded-xl bg-slate-50 border border-slate-200 p-3">
+                      <input
+                        type="text"
+                        value={editTitle}
+                        onChange={(e) => setEditTitle(e.target.value)}
+                        placeholder="Nome personalizado"
+                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs sm:text-sm font-semibold"
+                      />
+                      <textarea
+                        rows={2}
+                        value={editCaption}
+                        onChange={(e) => setEditCaption(e.target.value)}
+                        placeholder="Legenda ou descrição..."
+                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs sm:text-sm"
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleSaveInlineEdit(item.id)}
+                          className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-3 py-1 text-xs font-bold text-white"
+                        >
+                          <Check className="w-3.5 h-3.5" />
+                          Salvar
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setEditingItemId(null)}
+                          className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-3 py-1 text-xs font-semibold text-slate-600"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                          Cancelar
+                        </button>
                       </div>
-                      {item.textBody && (
+                    </div>
+                  ) : (
+                    <>
+                      {/* Nome personalizado sempre visível no topo da mídia ou quando diferente do texto */}
+                      {(item.category !== "text" ||
+                        (item.title && item.title !== item.textBody?.split("\n")[0]?.slice(0, 80))) && (
+                        <h3 className="text-sm font-extrabold text-slate-900 break-words leading-snug">
+                          {item.title}
+                        </h3>
+                      )}
+
+                      {item.category === "text" && (
                         <p className="text-sm text-slate-800 whitespace-pre-wrap leading-relaxed break-words">
                           {item.textBody}
                         </p>
                       )}
-                    </div>
+
+                      {item.category === "image" && item.mediaUrl && (
+                        <div className="space-y-2">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setLightbox({
+                                item,
+                                url: getExternalImageSrc(item.mediaUrl!),
+                              })
+                            }
+                            className="block rounded-xl overflow-hidden bg-slate-100"
+                          >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={getExternalImageSrc(item.mediaUrl)}
+                              alt={item.title}
+                              className="max-h-96 w-auto rounded-xl object-contain"
+                            />
+                          </button>
+                          {item.textBody && (
+                            <p className="text-sm text-slate-800 whitespace-pre-wrap leading-relaxed break-words">
+                              {item.textBody}
+                            </p>
+                          )}
+                        </div>
+                      )}
+
+                      {item.category === "video" && item.mediaUrl && (
+                        <div className="space-y-2">
+                          {renderVideoPlayer(item)}
+                          {item.textBody && (
+                            <p className="text-sm text-slate-800 whitespace-pre-wrap leading-relaxed break-words">
+                              {item.textBody}
+                            </p>
+                          )}
+                        </div>
+                      )}
+
+                      {(item.category === "document" || item.category === "chat") && (
+                        <div className="space-y-2.5">
+                          {/* Visualização direta dentro do chat para PDF ou documento externo (Drive/Docs/etc.) */}
+                          {item.mediaUrl &&
+                            (item.mimeType === "application/pdf" || isExternal) &&
+                            (() => {
+                              const embedUrl = isExternal
+                                ? getExternalDocumentEmbed(item.mediaUrl)
+                                : item.mediaUrl;
+                              return embedUrl ? (
+                                <iframe
+                                  src={embedUrl}
+                                  title={item.title}
+                                  className="w-full h-72 sm:h-80 rounded-xl border border-slate-200 bg-slate-50"
+                                />
+                              ) : null;
+                            })()}
+
+                          <div className="flex items-center gap-3 rounded-xl bg-slate-50 border border-slate-200/80 p-3">
+                            <div className="w-10 h-10 rounded-lg bg-[#0e526c]/10 text-[#0e526c] flex items-center justify-center shrink-0">
+                              <FileText className="w-5 h-5" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs sm:text-sm font-bold text-slate-900 truncate">
+                                {item.title}
+                              </p>
+                              <p className="text-[11px] text-slate-500">{sizeLabel}</p>
+                            </div>
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              {item.mediaUrl && (item.mimeType === "application/pdf" || isExternal) && (
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setLightbox({
+                                      item,
+                                      url: isExternal
+                                        ? getExternalDocumentEmbed(item.mediaUrl!) ?? item.mediaUrl!
+                                        : item.mediaUrl!,
+                                    })
+                                  }
+                                  title="Ampliar dentro do Chat"
+                                  className="rounded-lg bg-[#0e526c] p-2 text-white hover:bg-[#0b4156]"
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </button>
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => handleDownload(item)}
+                                title={isExternal ? "Acessar documento" : "Baixar"}
+                                className="rounded-lg border border-slate-300 bg-white p-2 text-slate-700 hover:bg-slate-100"
+                              >
+                                {isExternal ? (
+                                  <Eye className="w-4 h-4" />
+                                ) : (
+                                  <Download className="w-4 h-4" />
+                                )}
+                              </button>
+                            </div>
+                          </div>
+
+                          {item.textBody && (
+                            <p className="text-sm text-slate-800 whitespace-pre-wrap leading-relaxed break-words">
+                              {item.textBody}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </>
                   )}
 
                   <div className="flex items-center justify-end gap-2 text-[10px] text-slate-400">
@@ -778,71 +907,118 @@ export function ChatColaboradores({
         </div>
       )}
 
-      {/* Barra de envio estilo WhatsApp/Telegram (somente Admin) */}
+      {/* Barra de envio estilo WhatsApp/Telegram com Nome, Link e Legenda (somente Admin) */}
       {isAdmin && (
         <form
-          onSubmit={handleSendText}
-          className="bg-[#f0f2f5] border-t border-slate-200 px-3 sm:px-5 py-3 flex items-end gap-2.5 shrink-0"
+          onSubmit={handleSendFromBar}
+          className="bg-[#f0f2f5] border-t border-slate-200 px-3 sm:px-5 py-2.5 space-y-2 shrink-0"
         >
-          <label
-            title="Anexar arquivo (vídeo, imagem, GIF, PDF ou documento)"
-            className={`rounded-full p-2.5 text-slate-600 hover:bg-slate-200/80 cursor-pointer shrink-0 transition-colors ${
-              isSending ? "opacity-50 pointer-events-none" : ""
-            }`}
-          >
-            <Paperclip className="w-5 h-5" />
-            <input
-              type="file"
-              multiple
-              disabled={isSending}
-              onChange={(e) => {
-                const list = Array.from(e.target.files ?? []);
-                e.target.value = "";
-                handleUploadFiles(list);
-              }}
-              className="sr-only"
-            />
-          </label>
+          {uploadStatus && (
+            <p className="text-[11px] font-semibold text-[#0e526c] px-1">
+              {uploadStatus}
+            </p>
+          )}
 
-          <div className="flex-1 min-w-0">
-            {uploadStatus && (
-              <p className="text-[11px] font-semibold text-[#0e526c] mb-1 px-1">
-                {uploadStatus}
-              </p>
-            )}
-            <textarea
-              rows={1}
-              disabled={isSending}
-              value={messageText}
-              onChange={(e) => setMessageText(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  void handleSendText(e);
+          {/* Campos extras de Nome personalizado e Link quando ativados */}
+          {linkInputOpen && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-white p-2.5 rounded-xl border border-slate-300">
+              <input
+                type="text"
+                disabled={isSending}
+                value={messageTitle}
+                onChange={(e) => setMessageTitle(e.target.value)}
+                placeholder="Nome personalizado (ex.: Treinamento Aula 1)"
+                className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#0e526c]"
+              />
+              <input
+                type="url"
+                disabled={isSending}
+                value={quickLinkUrl}
+                onChange={(e) => setQuickLinkUrl(e.target.value)}
+                placeholder="Cole o link (YouTube, Drive, foto, PDF...)"
+                className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#0e526c]"
+              />
+            </div>
+          )}
+
+          <div className="flex items-end gap-2">
+            <label
+              title="Anexar arquivo (vídeo, imagem, GIF, PDF ou documento)"
+              className={`rounded-full p-2.5 text-slate-600 hover:bg-slate-200/80 cursor-pointer shrink-0 transition-colors ${
+                isSending ? "opacity-50 pointer-events-none" : ""
+              }`}
+            >
+              <Paperclip className="w-5 h-5" />
+              <input
+                type="file"
+                multiple
+                disabled={isSending}
+                onChange={(e) => {
+                  const list = Array.from(e.target.files ?? []);
+                  e.target.value = "";
+                  handleUploadFiles(list);
+                }}
+                className="sr-only"
+              />
+            </label>
+
+            <button
+              type="button"
+              onClick={() => setLinkInputOpen((v) => !v)}
+              title="Colar link com nome personalizado"
+              className={`rounded-full p-2.5 shrink-0 transition-colors ${
+                linkInputOpen
+                  ? "bg-[#0e526c] text-white"
+                  : "text-slate-600 hover:bg-slate-200/80"
+              }`}
+            >
+              <Link2 className="w-5 h-5" />
+            </button>
+
+            <div className="flex-1 min-w-0">
+              <textarea
+                rows={1}
+                disabled={isSending}
+                value={messageText}
+                onChange={(e) => setMessageText(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    void handleSendFromBar(e);
+                  }
+                }}
+                placeholder={
+                  linkInputOpen
+                    ? "Escreva uma legenda para o link/arquivo (opcional)..."
+                    : "Mensagem, legenda ou cole um link direto aqui..."
                 }
-              }}
-              placeholder="Escreva uma mensagem ou anexe um arquivo no clipe..."
-              className="w-full resize-none rounded-2xl border border-slate-300 bg-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0e526c]"
-            />
-          </div>
+                className="w-full resize-none rounded-2xl border border-slate-300 bg-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0e526c]"
+              />
+            </div>
 
-          <button
-            type="submit"
-            disabled={isSending || !messageText.trim()}
-            aria-label="Enviar mensagem"
-            className="rounded-full bg-[#0e526c] p-2.5 text-white hover:bg-[#0b4156] disabled:opacity-40 shrink-0 transition-colors"
-          >
-            <Send className="w-5 h-5" />
-          </button>
+            <button
+              type="submit"
+              disabled={isSending || (!messageText.trim() && !quickLinkUrl.trim())}
+              aria-label="Enviar mensagem"
+              className="rounded-full bg-[#0e526c] p-2.5 text-white hover:bg-[#0b4156] disabled:opacity-40 shrink-0 transition-colors"
+            >
+              <Send className="w-5 h-5" />
+            </button>
+          </div>
         </form>
       )}
 
-      {/* Modal de ampliação de imagem (com navegação da playlist) / PDF */}
+      {/* Modal de ampliação de imagem / documento dentro do Chat */}
       {lightbox && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-4xl w-full p-4 sm:p-5 space-y-3 max-h-[92vh] flex flex-col">
             <div className="flex items-center justify-between gap-3">
-              <p className="text-sm font-bold text-slate-900 truncate">{lightbox.item.title}</p>
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-slate-900 truncate">{lightbox.item.title}</p>
+                {lightbox.item.textBody && (
+                  <p className="text-xs text-slate-600 truncate">{lightbox.item.textBody}</p>
+                )}
+              </div>
               <button
                 type="button"
                 onClick={() => setLightbox(null)}

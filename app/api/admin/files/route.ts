@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     const extracted = extractUrlFromText(textBody);
     if (extracted) {
       rawLink = extracted.url;
-      textBody = extracted.cleanText || textBody;
+      textBody = extracted.cleanText || undefined;
     }
   }
 
@@ -139,12 +139,19 @@ export async function PATCH(request: NextRequest) {
   const existing = rows[0];
   if (!existing) return NextResponse.json({ error: "Item não encontrado" }, { status: 404 });
 
+  const nextCategory = body.category ?? existing.category;
+  const nextMimeType =
+    !existing.r2Key && existing.mimeType.endsWith("/external-url") && nextCategory !== "text"
+      ? `${nextCategory}/external-url`
+      : existing.mimeType;
+
   await db
     .update(files)
     .set({
       title: body.title?.trim() || existing.title,
-      category: body.category ?? existing.category,
-      textBody: body.textBody !== undefined ? body.textBody : existing.textBody,
+      category: nextCategory,
+      mimeType: nextMimeType,
+      textBody: body.textBody !== undefined ? body.textBody.trim() || null : existing.textBody,
       updatedAt: new Date().toISOString(),
     })
     .where(eq(files.id, existing.id));
