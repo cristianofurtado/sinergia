@@ -8,6 +8,8 @@ import {
   ShieldCheck,
   CheckCircle2,
   ChevronDown,
+  Building2,
+  Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -31,44 +33,55 @@ export function Hero() {
 
       {/* Centered Viewport Content */}
       <div className="flex-1 flex items-center w-full">
-        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-3 sm:py-4 [@media(max-height:700px)]:py-2">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-10 xl:gap-12 items-center">
+        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-3 sm:py-2.5 lg:py-4 [@media(max-height:700px)]:py-2">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-10 xl:gap-12 items-center">
             {/* Left Column: Headlines, Segments, CTAs, Proof */}
             <div
-              className="lg:col-span-7 space-y-3.5 sm:space-y-4 lg:space-y-6 [@media(max-height:780px)]:space-y-3 [@media(max-height:680px)]:space-y-2.5"
+              className="lg:col-span-7 space-y-3 sm:space-y-3.5 lg:space-y-6 [@media(max-height:780px)]:space-y-3 [@media(max-height:680px)]:space-y-2.5"
               id="energia"
             >
               {/* Main Headline */}
               <div className="space-y-2.5 sm:space-y-3 [@media(max-height:680px)]:space-y-2">
-                <h1 className="text-[clamp(1.5rem,3.4vw+0.6rem,3.75rem)] [@media(max-height:780px)]:text-[clamp(1.45rem,2.7vw+0.55rem,2.85rem)] font-black tracking-tight text-white leading-[1.08] [text-wrap:balance]">
-                  Economia de energia também pode ser uma{" "}
+                <h1 className="text-[clamp(1.6rem,3.4vw+0.6rem,3.75rem)] [@media(max-height:780px)]:text-[clamp(1.5rem,2.7vw+0.55rem,2.95rem)] font-black tracking-tight text-white leading-[1.08] [text-wrap:balance]">
+                  Economia de energia pode ser uma{" "}
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500">
-                    oportunidade de negócio.
+                    oportunidade.
                   </span>
                 </h1>
 
-                <p className="text-[clamp(0.875rem,0.55vw+0.72rem,1.1875rem)] text-sky-100/90 leading-relaxed [@media(max-height:700px)]:leading-snug font-normal max-w-2xl">
-                  A <strong className="text-white font-bold">Energia Prospectar</strong> conecta residências, empresas e corretores às maiores usinas de energia limpa do país. Reduza até 26% na sua conta de luz sem obras, sem placas solares e com suporte completo.
+                <p className="text-[clamp(0.875rem,0.55vw+0.72rem,1.15rem)] text-sky-100/90 leading-relaxed [@media(max-height:700px)]:leading-snug font-normal max-w-2xl">
+                  A <strong className="text-white font-bold">Energia Prospectar</strong> conecta residências, empresas e corretores às maiores usinas de energia limpa do país.{" "}
+                  <span className="block mt-1">
+                    Reduza até 26% na sua conta de luz sem obras, sem placas solares.
+                  </span>
                 </p>
               </div>
 
-              {/* Clean Segment Badges (B2C & B2B) */}
-              <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5 max-w-lg">
-                <div className="rounded-xl border border-white/20 bg-white/10 backdrop-blur-md p-2.5 sm:p-3 [@media(max-height:700px)]:p-2 shadow-sm">
-                  <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-sky-200 block">
-                    Mercado Livre (B2B)
-                  </span>
-                  <p className="text-[11px] sm:text-xs text-white/90 font-medium leading-snug mt-0.5">
-                    100% do Brasil para indústrias e empresas.
+              {/* Editorial Split Strip (B2B & Geração Distribuída) */}
+              <div className="grid grid-cols-2 max-w-xl border-t border-b border-white/15 py-2.5 lg:py-3.5 [@media(max-height:700px)]:py-2 divide-x divide-white/15">
+                <div className="pr-3 sm:pr-5 space-y-0.5">
+                  <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-sky-200">
+                    <Building2 className="w-3.5 h-3.5 text-sky-300 shrink-0" aria-hidden="true" />
+                    <span>Mercado Livre (B2B)</span>
+                  </div>
+                  <p className="text-sm sm:text-base lg:text-lg font-extrabold text-white leading-tight pt-0.5">
+                    100% do Brasil
+                  </p>
+                  <p className="text-[11px] sm:text-xs text-sky-100/80 leading-snug">
+                    para indústrias e empresas.
                   </p>
                 </div>
 
-                <div className="rounded-xl border border-amber-400/30 bg-amber-500/10 backdrop-blur-md p-2.5 sm:p-3 [@media(max-height:700px)]:p-2 shadow-sm">
-                  <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-amber-300 block">
-                    Geração Distribuída
-                  </span>
-                  <p className="text-[11px] sm:text-xs text-white/90 font-medium leading-snug mt-0.5">
-                    Até 26% em residências e comércios.
+                <div className="pl-3 sm:pl-5 space-y-0.5">
+                  <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-amber-300">
+                    <Zap className="w-3.5 h-3.5 text-amber-400 shrink-0" aria-hidden="true" />
+                    <span>Geração Distribuída</span>
+                  </div>
+                  <p className="text-sm sm:text-base lg:text-lg font-extrabold text-amber-300 leading-tight pt-0.5">
+                    Até 26%
+                  </p>
+                  <p className="text-[11px] sm:text-xs text-sky-100/80 leading-snug">
+                    em residências e comércios.
                   </p>
                 </div>
               </div>
@@ -160,11 +173,11 @@ export function Hero() {
 
             {/* Right Column: Full Phone Mockup (Tablet >= 768x900 & Desktop >= 1024px) */}
             <div className="hidden md:flex [@media(max-width:1023px)_and_(max-height:899px)]:hidden lg:col-span-5 justify-center">
-              <div className="relative w-full max-w-[270px] lg:max-w-[315px] xl:max-w-[340px] 2xl:max-w-[360px] [@media(max-height:780px)]:max-w-[285px]">
+              <div className="relative w-full max-w-[255px] lg:max-w-[315px] xl:max-w-[340px] 2xl:max-w-[360px] [@media(max-height:780px)]:max-w-[285px]">
                 {/* Outer Phone Hardware Case */}
-                <div className="rounded-[2.4rem] lg:rounded-[2.5rem] bg-gradient-to-b from-slate-800 via-slate-900 to-slate-950 p-2 lg:p-2.5 shadow-2xl border border-white/20">
+                <div className="rounded-[2.3rem] lg:rounded-[2.5rem] bg-gradient-to-b from-slate-800 via-slate-900 to-slate-950 p-1.5 lg:p-2.5 shadow-2xl border border-white/20">
                   {/* Inner Screen */}
-                  <div className="rounded-[2rem] bg-white text-slate-900 p-3.5 lg:p-5 [@media(max-height:780px)]:p-3.5 overflow-hidden shadow-inner font-sans">
+                  <div className="rounded-[1.9rem] lg:rounded-[2rem] bg-white text-slate-900 p-3 lg:p-5 [@media(max-height:780px)]:p-3.5 overflow-hidden shadow-inner font-sans">
                     {/* Dynamic Island / Speaker */}
                     <div className="w-16 sm:w-20 h-3 bg-slate-900 rounded-full mx-auto mb-2.5 [@media(max-height:780px)]:mb-2" />
 
