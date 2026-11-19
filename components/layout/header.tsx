@@ -58,18 +58,18 @@ export function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-[#0e526c]/15 bg-white/95 backdrop-blur-md transition-all shadow-xs">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 sm:h-18 lg:h-20">
-          {/* Logo Oficial */}
+    <header className="sticky top-0 z-40 w-full h-[var(--header-h)] border-b border-[#0e526c]/15 bg-white/95 backdrop-blur-md transition-all shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+        <div className="flex items-center justify-between h-full">
+          {/* Logo Oficial Horizontal */}
           <Link href="#inicio" className="flex items-center shrink-0">
             <Image
               src="/logo-oficial.png"
-              alt="Energia Prospectar"
-              width={140}
-              height={36}
+              alt="Grupo Energia Prospectar"
+              width={160}
+              height={50}
               priority
-              className="h-7 sm:h-8 lg:h-9 w-auto object-contain transition-opacity hover:opacity-90"
+              className="h-9 sm:h-10 lg:h-11 w-auto object-contain transition-opacity hover:opacity-90"
             />
           </Link>
 
@@ -140,11 +140,11 @@ export function Header() {
             >
               <Image
                 src="/logo-oficial.png"
-                alt="Energia Prospectar"
-                width={130}
-                height={34}
+                alt="Grupo Energia Prospectar"
+                width={145}
+                height={45}
                 priority
-                className="h-7 w-auto object-contain"
+                className="h-9 w-auto object-contain"
               />
             </Link>
 

@@ -6,12 +6,25 @@
   :root {
     --background: #f8fafc;
     --foreground: #0f172a;
+    --header-h: 4rem;
+  }
+
+  @media (min-width: 1024px) {
+    :root {
+      --header-h: 5rem;
+    }
   }
 
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
   }
 
   body {
@@ -21,8 +34,21 @@
     overflow-x: hidden;
   }
 
+  section[id],
+  [id="simulador"],
+  [id="cobertura"] {
+    scroll-margin-top: var(--header-h);
+  }
+
   ::selection {
     background-color: #fed7aa;
     color: #9a3412;
+  }
+}
+
+@layer components {
+  .hero-viewport {
+    min-height: calc(100vh - var(--header-h));
+    min-height: calc(100svh - var(--header-h));
   }
 }
