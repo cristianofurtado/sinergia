@@ -33,11 +33,11 @@ export default async function LoginPage({
         <div className="bg-gradient-to-br from-white via-slate-50 to-sky-50 flex flex-col items-center justify-center p-10 sm:p-14 gap-6">
           <Image
             src="/logo-energia-prospectar.webp"
-            alt="Energia Prospectar"
+            alt="Grupo Energia Prospectar"
             width={240}
-            height={70}
+            height={240}
             priority
-            className="w-56 sm:w-64 h-auto object-contain drop-shadow-xs"
+            className="w-52 h-52 sm:w-60 sm:h-60 object-contain drop-shadow-sm"
           />
           <span className="h-1 w-10 rounded-full bg-amber-500" aria-hidden="true" />
         </div>

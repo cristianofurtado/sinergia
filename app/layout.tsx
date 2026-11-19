@@ -27,7 +27,8 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Energia Prospectar" }],
   icons: {
-    icon: "/logo-oficial.png",
+    icon: "/logo-emblem.png",
+    apple: "/logo-vertical.png",
   },
   robots: "index, follow",
   openGraph: {

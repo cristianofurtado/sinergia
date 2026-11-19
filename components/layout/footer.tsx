@@ -12,13 +12,13 @@ export function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 sm:gap-10">
           {/* Brand Column */}
           <div className="sm:col-span-2 space-y-3.5">
-            <Link href="#inicio" className="inline-block p-2 rounded-xl bg-white shadow-xs">
+            <Link href="#inicio" className="inline-block">
               <Image
-                src="/logo-oficial.png"
-                alt="Energia Prospectar"
-                width={140}
-                height={36}
-                className="h-7 sm:h-8 w-auto object-contain"
+                src="/logo-horizontal-dark.png"
+                alt="Grupo Energia Prospectar"
+                width={194}
+                height={60}
+                className="h-11 sm:h-12 w-auto object-contain"
               />
             </Link>
             <p className="text-xs sm:text-sm text-sky-100/80 leading-relaxed max-w-sm">

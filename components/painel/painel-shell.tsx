@@ -33,13 +33,13 @@ function PainelNav({
   return (
     <div className="flex flex-col h-full justify-between">
       <div className="space-y-6">
-        <div className="bg-white rounded-xl p-3 flex items-center justify-center shadow-xs">
+        <div className="flex items-center justify-center py-1">
           <Image
             src="/logo-energia-prospectar.webp"
-            alt="Energia Prospectar"
-            width={160}
-            height={44}
-            className="h-8 w-auto object-contain"
+            alt="Grupo Energia Prospectar"
+            width={112}
+            height={112}
+            className="w-28 h-28 object-contain drop-shadow-sm"
           />
         </div>
 
@@ -119,15 +119,13 @@ export function PainelShell({
       {/* Barra superior mobile */}
       <header className="lg:hidden sticky top-0 z-30 bg-[#0e526c] text-white px-4 py-2.5 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-2.5">
-          <div className="bg-white rounded-lg px-2 py-1">
-            <Image
-              src="/logo-energia-prospectar.webp"
-              alt="Energia Prospectar"
-              width={110}
-              height={30}
-              className="h-5 w-auto object-contain"
-            />
-          </div>
+          <Image
+            src="/logo-horizontal-dark.png"
+            alt="Grupo Energia Prospectar"
+            width={130}
+            height={40}
+            className="h-7 w-auto object-contain"
+          />
           <span className="text-xs font-bold text-sky-100 truncate">
             Chat Colaboradores
           </span>

@@ -92,42 +92,86 @@ export default function LogosPage() {
         </div>
 
         {/* Official Brand Logo */}
-        <div className="bg-slate-900 text-white rounded-2xl p-6 sm:p-8 shadow-md space-y-4 border border-slate-800">
+        <div className="bg-slate-900 text-white rounded-2xl p-6 sm:p-8 shadow-md space-y-6 border border-slate-800">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
             <div>
               <span className="text-xs font-semibold uppercase tracking-wider text-amber-400">
                 Identidade Oficial Ativa
               </span>
               <h2 className="text-2xl font-bold text-white mt-0.5">
-                Logo Oficial Sinergia
+                Grupo Energia Prospectar — Vertical &amp; Horizontal
               </h2>
               <p className="text-xs text-slate-400 mt-0.5">
-                Arquivo fonte: <code>/dados/Projetos/Sinergia/logo-oficial.png</code> (1695×452px RGBA)
+                Selo Vertical (1024×1024 RGBA) e Versões Horizontais Claro/Escuro (1547×480 RGBA)
               </p>
             </div>
-            <a
-              href="/logo-oficial.png"
-              download="logo-oficial.png"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold bg-amber-500 hover:bg-amber-400 text-slate-950 px-3.5 py-2 rounded-lg transition-colors font-medium self-start sm:self-auto"
-            >
-              <Download className="w-4 h-4" />
-              Baixar Logo Oficial (PNG HD)
-            </a>
+            <div className="flex flex-wrap gap-2 self-start sm:self-auto">
+              <a
+                href="/logo-vertical.png"
+                download="logo-vertical.png"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold bg-amber-500 hover:bg-amber-400 text-slate-950 px-3.5 py-2 rounded-lg transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                Vertical (PNG)
+              </a>
+              <a
+                href="/logo-horizontal.png"
+                download="logo-horizontal.png"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold bg-white hover:bg-slate-100 text-slate-950 px-3.5 py-2 rounded-lg transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                Horizontal Claro
+              </a>
+              <a
+                href="/logo-horizontal-dark.png"
+                download="logo-horizontal-dark.png"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 px-3.5 py-2 rounded-lg transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                Horizontal Escuro
+              </a>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center pt-2">
-            <div className="bg-white p-6 rounded-xl flex items-center justify-center shadow-inner">
+            <div className="bg-white p-6 rounded-xl flex flex-col items-center justify-center gap-4 shadow-inner">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                Modo Horizontal (Fundo Claro)
+              </span>
               <img
-                src="/logo-oficial.png"
-                alt="Logo Oficial Sinergia"
-                className="max-h-14 w-auto object-contain"
+                src="/logo-horizontal.png"
+                alt="Grupo Energia Prospectar Horizontal"
+                className="max-h-20 w-auto object-contain"
               />
             </div>
-            <div className="bg-slate-950 p-6 rounded-xl flex items-center justify-center border border-slate-800">
+            <div className="bg-[#072430] p-6 rounded-xl flex flex-col items-center justify-center gap-4 border border-slate-800">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                Modo Horizontal (Fundo Escuro)
+              </span>
               <img
-                src="/logo-oficial.png"
-                alt="Logo Oficial Sinergia (Dark)"
-                className="max-h-14 w-auto object-contain"
+                src="/logo-horizontal-dark.png"
+                alt="Grupo Energia Prospectar Horizontal (Dark)"
+                className="max-h-20 w-auto object-contain"
+              />
+            </div>
+            <div className="bg-white p-6 rounded-xl flex flex-col items-center justify-center gap-4 shadow-inner">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                Modo Vertical / Selo (Fundo Claro)
+              </span>
+              <img
+                src="/logo-vertical.png"
+                alt="Grupo Energia Prospectar Vertical"
+                className="h-44 w-44 object-contain"
+              />
+            </div>
+            <div className="bg-[#072430] p-6 rounded-xl flex flex-col items-center justify-center gap-4 border border-slate-800">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                Modo Vertical / Selo (Fundo Escuro)
+              </span>
+              <img
+                src="/logo-vertical.png"
+                alt="Grupo Energia Prospectar Vertical (Dark)"
+                className="h-44 w-44 object-contain"
               />
             </div>
           </div>

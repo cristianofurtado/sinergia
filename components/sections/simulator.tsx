@@ -99,11 +99,11 @@ export function Simulator() {
           <div className="text-center space-y-2 max-w-2xl mx-auto">
             <div className="flex justify-center">
               <Image
-                src="/logo-oficial.png"
-                alt="Energia Prospectar"
-                width={140}
-                height={36}
-                className="h-7 sm:h-8 w-auto object-contain"
+                src="/logo-vertical.webp"
+                alt="Grupo Energia Prospectar"
+                width={96}
+                height={96}
+                className="h-20 w-20 sm:h-24 sm:w-24 object-contain drop-shadow-xs"
               />
             </div>
             <h3 className="text-lg sm:text-2xl font-black text-[#0e526c] tracking-tight uppercase">
